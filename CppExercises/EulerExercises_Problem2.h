@@ -1,3 +1,3 @@
 #pragma once
 
-int EulerExerciseFibonacciEven(const int count_until);
+int EulerExerciseProblem2(const int count_until);

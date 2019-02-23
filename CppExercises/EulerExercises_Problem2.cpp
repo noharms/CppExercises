@@ -8,7 +8,7 @@
 
 
 
-int EulerExerciseFibonacciEven(const int count_until) {
+int EulerExerciseProblem2(const int count_until) {
 
 	// calculate the sum of all even Fibonacci numbers that are smaller than 4*10^6
 
