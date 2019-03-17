@@ -7,6 +7,7 @@
 #include "EulerExercises_Problem2.h"
 #include "EulerExercises_Problem4.h"
 #include "EulerExercises_Problem8.h"
+#include "EulerExercises_Problem15.h"
 
 void MainEulerExercises() {
 
@@ -32,9 +33,16 @@ void MainEulerExercises() {
 	std::cout << "Considering " << adjacent_digits_to_consider << " adjacent digits" << std::endl;
 	std::cout << "the largest product of the digits in the given 1000-digit number (see src-file)" << std::endl;
 	std::cout << "is: " << largest_product << std::endl;	
+
+	//------------- Problem 15: https://projecteuler.net/problem=15
+	std::cout << std::endl << "--- Euler Problem 15" << std::endl;
+	const int dim_grid = 2;
+	int found_downrightroutes_through_grid = EulerExerciseProblem15(dim_grid);
+	std::cout << "Found " << found_downrightroutes_through_grid;
+	std::cout << " possible routes through the " << dim_grid << "x" << dim_grid << " grid." << std::endl;
+
+	//--------------------------
 	std::cout << std::endl << std::endl;
-
-
 	std::cout << "----------- Leaving MainEulerExercises " << std::endl;
 
 	return;
