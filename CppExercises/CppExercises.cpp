@@ -6,12 +6,17 @@
 #include <iostream>
 
 #include "EulerExercises_Main.h"
+#include "ElementsOfProgramming/ElementsOfProgramming_Main.h"
 
 int main()
 {
     std::cout << "------------- Entering the main file of the 'CppExercises' Project " << std::endl;
 
-	MainEulerExercises();
+	//---------------------- Euler
+	// MainEulerExercises();
+
+	//---------------------- Elements of Programming book
+	MainElementsOfProgrammingExercises();
 
 	std::cout << "------------- Leaving the main file of the 'CppExercises' Project " << std::endl;
 }
