@@ -4,6 +4,7 @@
 #include "ElementsOfProgramming_Chapter18Graphs.h"
 
 #include <iostream>
+#include <queue>
 
 
 
@@ -66,10 +67,13 @@ void ElementsOfProgrammingChapter18Graphs_ExerciseWinReachability() {
 
 	std::list<std::string> winning_path;
 	const std::string start_node = "Schalke";
-	const std::string target_node = "Bayern";
-	bool isreachable = FindWinningPath(win_graph, start_node, target_node, winning_path);
-	
-	std::cout << "Search was " << (isreachable ? "successfull" : "not successfull") << std::endl;
+	const std::string target_node = "Bayern";    
+    bool isreachable = false;
+    
+    //------ try with DFS search
+    std::cout << "-- Starting DFS Search " << std::endl;
+    isreachable = FindWinningPath(win_graph, start_node, target_node, winning_path, "DFS");	
+	std::cout << "DFS Search " << (isreachable ? "found the target" : "did not find the target") << std::endl;
 	std::string prev_node = start_node;
 	if (isreachable) {
 		std::cout << "The following path was found from " << start_node << " to " << target_node << " (note: there may be other paths): " << std::endl;
@@ -78,6 +82,11 @@ void ElementsOfProgrammingChapter18Graphs_ExerciseWinReachability() {
 			prev_node = *it;
 		}
 	}
+   
+    //------ try with BFS search
+    std::cout << "-- Starting BFS Search " << std::endl;
+    isreachable = FindWinningPath(win_graph, start_node, target_node, winning_path, "BFS");
+    std::cout << "BFS Search " << (isreachable ? "found the target" : "did not find the target") << std::endl;    
 
 	return;
 }
@@ -94,21 +103,39 @@ bool FindWinningPath(
 	std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
 	std::string teamA, 
 	std::string teamB,
-	std::list<std::string>& path) {
+	std::list<std::string>& path,
+    const std::string& search_mode) {
 	
 	// use a depth first search approach
-	std::unordered_set<std::string> visited_nodes;
-	bool isreachable = GraphDFS(graph, teamA, teamB, path, visited_nodes);
+    bool isreachable = false;
+    
+    if (search_mode == "DFS") {
+        std::unordered_set<std::string> visited_nodes;
+        isreachable = GraphDFS(graph, teamA, teamB, path, visited_nodes);
+    }
+    else if (search_mode == "BFS") {
+        isreachable = GraphBFS(graph, teamA, teamB);
+    }
 
 	return isreachable;
 }
 
 /**
-* Does not necessarily find the shortest path because it goes down the graph until it reaches the target.
+* In a depth first search for a target node the traversal
+* through the graph goes first as far away from the base node
+* as possible. If a sink is reached the traversal goes back  
+* one level closer to the base and from there it goes again
+* as far down as possible.
 *
+* If a node has more than one child, the DFS takes a random child first.
+*
+* Note: Does not necessarily find the shortest path because it goes
+*       down the graph until it reaches the target.
+*
+* Note: For DFS you need a visited_nodes variable with larger scope
+*       to safeguard against cycles if using a recursive approach.
 *
 */
-
 bool GraphDFS(
 	std::unordered_map<std::string, std::unordered_set<std::string>>& graph, 
 	std::string base, 
@@ -146,4 +173,53 @@ bool GraphDFS(
 	}
 
 	return target_visited;
+}
+
+
+/*
+* A Breadth first search for a target node first checks all nodes that have distance 1 to the 
+* base node. Then it goes trhough the nodes at level 1, at random order, collects
+* the nodes that are distance one away from them (and thus distance 2 away from the base)
+* and checks those nodes.
+*
+* Note: in a dfs search it is not easy to access to track the path that has
+*       been traversed until the target node is found.
+*
+* Note: For BFS you also need a visited_nodes variable
+*       to safeguard against cycles but since it is typically not implemented recursively
+*       it can go inside the function.
+*/
+bool GraphBFS(
+    const std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
+    const std::string& base_node,
+    const std::string& target_node
+    ) {
+
+    bool target_visited = false;
+    std::unordered_set<std::string> visited_nodes;
+
+    std::queue<std::string> nodes_to_check;
+    nodes_to_check.push(base_node);
+    while (!nodes_to_check.empty()) {
+        std::string curr_node = nodes_to_check.front();
+        nodes_to_check.pop();
+        visited_nodes.emplace(curr_node);
+        // debug
+        std::cout << "checking node " << curr_node << " " << std::endl;
+        if (curr_node == target_node) {
+            target_visited = true;
+            break;
+        }
+        const std::unordered_set<std::string> children = graph.at(curr_node);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            const std::string& child = *it;
+            // instead of putting a visited node to the queue and ignoring it
+            // upon check later, simply do not even add visited nodes again
+            if (visited_nodes.find(child) == visited_nodes.end()) {
+                nodes_to_check.push(child);
+            }            
+        }
+    }
+
+    return target_visited;
 }
