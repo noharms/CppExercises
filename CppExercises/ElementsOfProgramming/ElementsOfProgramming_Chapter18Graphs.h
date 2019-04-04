@@ -10,6 +10,7 @@
 void ElementsOfProgrammingChapter18Graphs();
 
 void ElementsOfProgrammingChapter18Graphs_ExerciseWinReachability();
+void ElementsOfProgrammingChapter18Graphs_FindAPathFromEntranceToExit();
 
 bool FindWinningPath(
     std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
@@ -18,16 +19,18 @@ bool FindWinningPath(
     std::list<std::string>& path,
     const std::string& search_mode);
 
-
 bool GraphDFS(
-	std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
-	std::string base,
-	std::string target,
-	std::list<std::string>& path,
-	std::unordered_set<std::string>& visited_nodes);
+    std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
+    std::string base,
+    std::string target,
+    std::list<std::string>& path,
+    std::unordered_set<std::string>& visited_nodes);
 
 bool GraphBFS(
     const std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
     const std::string& base_node,
     const std::string& target_node
 );
+
+
+std::string ToStringIndexPair(std::pair<int, int> indexpair);
