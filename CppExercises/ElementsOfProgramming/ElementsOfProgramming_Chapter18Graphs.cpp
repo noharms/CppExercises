@@ -8,6 +8,10 @@
 #include <time.h>
 
 
+const int kWHITE = 1;
+const int kBLACK = 0;
+const int kFLIPPED = 2;
+
 typedef std::string std_str;
 typedef std::unordered_map<std::string, std::unordered_set<std::string>> hashmap_team2beatenteams;
 
@@ -15,12 +19,35 @@ void ElementsOfProgrammingChapter18Graphs() {
 
 	std::cout << "-- Entering ElementsOfProgrammingChapter18Graphs " << std::endl;
 
-	//--------- Exercise: Win Reachability From Team A to Team B
+  //--------- Exercise: Win Reachability From Team A to Team B
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Win Reachability: " << std::endl;
+  std::cout << "------------------------------" << std::endl;
 	ElementsOfProgrammingChapter18Graphs_ExerciseWinReachability();
 
-    //--------- Exercise 18.1: search a maze for a path from entrance to exit
-    ElementsOfProgrammingChapter18Graphs_FindAPathFromEntranceToExit();
+  //--------- Exercise 18.1: search a maze for a path from entrance to exit
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: 18.1 " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter18Graphs_FindAPathFromEntranceToExit();
 
+  //--------- Exercise 18.2: flip color of adjacency region around given point
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: 18.2 " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter18Graphs_FlipColorAdjacencyRegion();
+  
+  //--------- Exercise 18.3: flip color of trapped white fields
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: 18.3 " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter18Graphs_FlipColorTrappedWhiteFields();
+
+  //--------- Exercise 18.4: detection of cycle
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: 18.4 " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter18Graphs_CycleDetection();
 
 	return;
 }
@@ -113,7 +140,7 @@ void ElementsOfProgrammingChapter18Graphs_ExerciseWinReachability() {
 void ElementsOfProgrammingChapter18Graphs_FindAPathFromEntranceToExit() {
     
     // initialize randomization function rand()
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
 
     // generate the maze
     const int kMazeSize = 5;
@@ -220,7 +247,124 @@ void ElementsOfProgrammingChapter18Graphs_FindAPathFromEntranceToExit() {
     return;
 }
 
+/** Exercise description
 
+    given a 2d matrix of black and white entries,
+    and one point inside the matrix,
+    flip all fields that are in the same-color-adjacency region of the given point:
+    the region is defined by those points having the same color as the given point
+    and being reachable by up, down, rght, left movements
+    from the given point on a path over fields of the same color
+ */
+void ElementsOfProgrammingChapter18Graphs_FlipColorAdjacencyRegion() {
+  
+  // create 2d random filled matrix
+  std::array<std::array<int, kDim2>, kDim1> matrix;
+  FillatrandomWithBlackAndWhite2dMatrix(&matrix, 3, 2);
+
+  // output the randomly created matrix
+  PrintColorMatrix(matrix);
+
+  // choose a point at random
+  IntPair anchor_pt;
+  anchor_pt.x = rand() % kDim1;
+  anchor_pt.y = rand() % kDim2;
+  std::cout << "Anchor point: x=" << anchor_pt.x << ", y=" << anchor_pt.y << std::endl << std::endl;
+    
+  // Flip the color in the adjacency region
+  const int val_at_anchor_pt = matrix.at(anchor_pt.x).at(anchor_pt.y);
+  FlipColorAdjacencyRegion(&matrix, anchor_pt, val_at_anchor_pt);
+    
+  // output the matrix after flipping colors
+  PrintColorMatrix(matrix); 
+
+  return;
+}
+
+
+/** Exercise description
+
+    given a 2d matrix of black and whit entires,
+    we consider those white fields trapped that do not have
+    a connection to a whit field at the border of the matrix
+    (a connection means a path over other white fields with only
+    top, down, left, rght movement allowed)
+
+    the task is to flip all white fields that are trapped to black.
+*/
+void ElementsOfProgrammingChapter18Graphs_FlipColorTrappedWhiteFields() {
+
+  // create 2d random filled matrix
+  std::array<std::array<int, kDim2>, kDim1> matrix;
+  FillatrandomWithBlackAndWhite2dMatrix(&matrix, 4, 2);
+
+  // output the randomly created matrix
+  PrintColorMatrix(matrix);
+  
+  // Flip the color of all adjacency regions that do not reach the boundary
+  FlipColorBorderedRegions(&matrix);
+
+  // output the matrix after flipping colors
+  PrintColorMatrix(matrix);
+
+  return;
+}
+
+/** Exercise description
+
+    Given a directed graph (that is not necessarily strongly connected)
+    find out whether the graph contains a cycle or not.
+
+*/
+void ElementsOfProgrammingChapter18Graphs_CycleDetection() {
+
+  // build some graph with random connections
+  const int kNumberNodes = 5;
+
+  // let's represent the graph here as a vector of nodes
+  std::vector<GraphNodeType> graph;
+  for (int i = 0; i < kNumberNodes; ++i) {
+    graph.emplace_back(GraphNodeType(i));
+  }
+  // add edges at random between the nodes
+  for (int i = 0; i < kNumberNodes; ++i) {
+    for (int j = 0; j < kNumberNodes; ++j) {
+      if (j == i) {
+        continue; // edges to oneself would make no sense..
+      }
+      // 50:50 chance that node i has an edge to node j
+      if (rand() % 2) {
+        GraphNodeType* connected_node_ptr = &(graph[j]);
+        graph[i].edges.emplace_back(connected_node_ptr);
+      }
+    }
+  }
+
+  // show the connections
+  std::cout << "The graph contains the following edges:" << std::endl;
+  for (int i = 0; i < kNumberNodes; ++i) {
+    std::cout << "Node with id=" << graph[i].id << " has edges to: ";
+    for (size_t k = 0; k < graph[i].edges.size(); ++k) {
+      GraphNodeType* connected_node_ptr = graph[i].edges.at(k);
+      std::cout << connected_node_ptr->id << ", ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  // check if there is a cycle
+  bool contains_cycle = GraphDFSForCycle_Wrapper(&graph);
+
+  // print result
+  if (contains_cycle) {
+    std::cout << "Result: a cycle was detected in the graph." << std::endl;
+  }
+  else {
+    std::cout << "Result: NO cycle detected in the graph." << std::endl;
+  }
+
+  return;
+}
 
 /**
  *----------------------------------------------------------------------------------------------
@@ -355,10 +499,232 @@ bool GraphBFS(
     return target_visited;
 }
 
-
-
 // create a string from the pair of indices 
 // (a string representation is used as a key for for the hashmap to avoid custom hash-function)
 std::string ToStringIndexPair(std::pair<int, int> indexpair) {
     return "(" + std::to_string(indexpair.first) + "," + std::to_string(indexpair.second) + ")";
+}
+
+void FlipColorAdjacencyRegion(std::array<std::array<int, kDim2>, kDim1>* mat_ptr,
+  const IntPair pt,
+  const int reference_value) {
+
+  std::array<std::array<int, kDim2>, kDim1>& A = *mat_ptr;
+
+  A.at(pt.x).at(pt.y) = kFLIPPED;
+
+  const IntPair kDirs[4] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+
+  // check all four neighbors, if they also have the same reference value
+  for (auto & dir : kDirs) {
+    int i = pt.x + dir.x;
+    int j = pt.y + dir.y;
+    if (i >= 0 && i < kDim1 && j >= 0 && j < kDim2) {
+      int value_at_neighbor = A[i][j];
+      if (value_at_neighbor == reference_value) {
+        FlipColorAdjacencyRegion(mat_ptr, { i, j }, reference_value);
+      }
+    }
+  }
+
+
+  return;
+}
+
+void FlipColorBorderedRegions(std::array<std::array<int, kDim2>, kDim1>* matrix_ptr) {
+
+  std::array<std::array<int, kDim2>, kDim1>& mat = *matrix_ptr;
+
+  // find all adjacency regions that CAN reach the boundary
+  // go through top and bottom row
+  for (size_t j = 0; j < mat.at(0).size(); ++j) {
+    int val = mat[0][j];
+    if (val == kWHITE) {
+      TraverseAndMarkAdjacencyRegion(matrix_ptr, IntPair{ 0, (int)j });
+    }
+    val = mat[(mat.size() - 1)][j];
+    if (val == kWHITE) {
+      TraverseAndMarkAdjacencyRegion(matrix_ptr, IntPair{ (int)mat.size() - 1, (int)j });
+    }
+  }
+  // go through leftmost and rightmost collumn    
+  for (size_t i = 0; i < mat.size(); ++i) {
+    int val = mat[i][0];
+    if (val == kWHITE) {
+      TraverseAndMarkAdjacencyRegion(matrix_ptr, IntPair{ (int)i, 0 });
+    }
+    val = mat[i][mat.at(i).size() - 1];
+    if (val == kWHITE) {
+      TraverseAndMarkAdjacencyRegion(matrix_ptr, IntPair{ (int)i, (int)mat.at(i).size() - 1 });
+    }
+  }
+
+  // make all the inner fields that are still white black
+  for (size_t i = 1; i < mat.size() - 1; ++i) {
+    for (size_t j = 1; j < mat.at(i).size() - 1; ++j) {
+      if (mat[i][j] == kWHITE) {
+        mat[i][j] = kBLACK;
+      }
+    }
+  }
+
+
+  return;
+}
+
+void TraverseAndMarkAdjacencyRegion(std::array<std::array<int, kDim2>, kDim1>* matrix_ptr,
+  const IntPair point)
+{
+  std::array<std::array<int, kDim2>, kDim1>& matrix = *matrix_ptr;
+
+  matrix[point.x][point.y] = kFLIPPED;
+
+  // check for neighbors that might be flipped as well
+  const IntPair kDirs[4] = { {0, 1}, {0, -1}, {1, 0}, {-1, 0} };
+
+  for (auto dir : kDirs) {
+    int i = point.x + dir.x;
+    int j = point.y + dir.y;
+    if (i >= 0 && i < (int)matrix.size() && j >= 0 && j < (int)matrix.at(i).size()) {
+      if (matrix.at(i).at(j) == kWHITE) {
+        TraverseAndMarkAdjacencyRegion(matrix_ptr, IntPair{ i, j });
+      }
+    }
+  }
+
+  return;
+}
+
+
+void PrintColorMatrix(std::array<std::array<int, kDim2>, kDim1> arr) {
+
+  std::cout << "The matrix is: " << std::endl;
+  for (size_t i = 0; i < arr.size(); ++i) {
+    std::cout << "Line " << i << "| ";
+    for (size_t j = 0; j < arr.at(0).size(); ++j) {
+      int val_at_ij = arr.at(i).at(j);
+      switch (val_at_ij) {
+      case kWHITE:
+        std::cout << "O";
+        break;
+      case kBLACK:
+        std::cout << "X";
+        break;
+      case kFLIPPED:
+        std::cout << "F";
+        break;
+      default:
+        std::cout << "E";  // E for Error , should not be reached
+        break;
+      }
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+
+  return;
+}
+
+/* Fill at random a given 2d matrix 
+ 
+   play with max_rand_number and white_threshold to shift ratio of white to black fields
+*/
+void FillatrandomWithBlackAndWhite2dMatrix(std::array< std::array<int, kDim2>, kDim1>* mat_ptr, 
+  const int max_rand_number, 
+  const int white_threshold) {
+  
+  srand((unsigned int) time(NULL));
+
+  std::array< std::array<int, kDim2>, kDim1>& matrix = *mat_ptr;
+
+  for (int i = 0; i < kDim1; ++i) {
+    for (int j = 0; j < kDim2; ++j) {
+      int rand_number = rand() % max_rand_number;
+      if (rand_number < white_threshold) {
+        matrix[i][j] = kWHITE;
+      }
+      else {
+        matrix[i][j] = kBLACK;
+      }
+    }
+  }
+
+  return;
+}
+
+
+/** Wrapper for the DFS that uses a list of ancestors and a list of visited nodes
+    with higher scope.
+
+    --> these lists are defined in the wrapper and then passed to the
+        recursive DFS function
+
+*/
+bool GraphDFSForCycle_Wrapper(std::vector<GraphNodeType>* graph_ptr) {
+
+  bool graph_contains_cycle = false;
+
+  std::vector<GraphNodeType>& graph = *graph_ptr;
+
+  // create empty sets for tracking visited nodes and ancestor nodes
+  std::unordered_set<int> ancestors;
+  std::unordered_set<int> visited;
+
+  for (size_t i = 0; i < graph.size(); ++i) {
+    graph_contains_cycle = GraphDFSForCycle(&(graph[i]), &ancestors, &visited);
+    if (graph_contains_cycle) {
+      break;
+    }
+  }  
+
+  return graph_contains_cycle;
+}
+
+/**
+    Recursive DFS function to detect a cycle.
+
+    Relies on outer scope lists for ancestors and visited nodes. 
+
+*/
+bool GraphDFSForCycle(
+  GraphNodeType* curr_node_ptr,
+  std::unordered_set<int>* ancestors_ptr,
+  std::unordered_set<int>* visited_ptr) {
+    
+  std::unordered_set<int>& ancestors = *ancestors_ptr;
+  std::unordered_set<int>& visited = *visited_ptr;
+  
+  if (ancestors.find(curr_node_ptr->id) != ancestors.end()) { // this node is its own ancestor
+    // print for debug
+    std::cout << "ALERT: cycle detected!" << std::endl;
+    std::cout << "-> We reached node with id=" << curr_node_ptr->id;
+    std::cout << " in a search branch that contains the same node as an ancestor." << std::endl;
+    std::cout << "(current list of ancestors: ";
+    for (auto& it : ancestors) {
+      std::cout << it << ", ";
+    }
+    std::cout << ")" << std::endl;
+    return true;
+  }
+  else if (visited.find(curr_node_ptr->id) != visited.end()) {   // node already visited
+    return false;
+  }
+  else {
+    // if the current node was neither visited before nor its own ancestor
+    // we can start to look into its descendents
+    visited.emplace(curr_node_ptr->id);
+    ancestors.emplace(curr_node_ptr->id);
+    std::vector<GraphNodeType*>& connected_nodes = curr_node_ptr->edges;
+    for (auto& connected_node_ptr : connected_nodes) {      
+      if (GraphDFSForCycle(connected_node_ptr, ancestors_ptr, visited_ptr)) {
+        return true; // if we find a cycle at some point, we can stop the search and return true
+      }
+    }
+    // if we are done processing the descendents of the current node, it will no longer be an
+    // ancestor for the next nodes that we visit
+    ancestors.erase(curr_node_ptr->id);
+    return false;
+  }
+
 }
