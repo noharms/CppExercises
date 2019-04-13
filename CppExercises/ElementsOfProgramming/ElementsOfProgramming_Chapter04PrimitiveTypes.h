@@ -3,10 +3,21 @@
 
 void ElementsOfProgrammingChapter04PrimitiveTypes();
 
-void ElementsOfProgrammingChapter04PrimitiveTypes_UnsetLSB();
-void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingLSB();
+void ElementsOfProgrammingChapter04PrimitiveTypes_UnsetLowestSetBit(unsigned int number);
 
-int UnsetLSB(int num);
-bool ComputeParityUsingUnsetLSB(int num);
+void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityPerDefinition(unsigned int number);
+void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingLowestSetBit(unsigned int number);
+void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingLookupTable(unsigned int number);
+void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingDivideAndConquer(unsigned int number);
 
-void PrintIntegerAsBitField(int num);
+int UnsetLowestSetBit(unsigned int  num);
+
+bool ComputeParityPerDefinition(unsigned int num);
+
+bool ComputeParityUsingUnsetLowestSetBit(unsigned int  num);
+
+bool ComputeParityUsingLookUpTable(unsigned int  num);
+
+bool ComputeParityUsingDivideAndConquer(unsigned int num, int n_bits_considered);
+
+void PrintIntegerAsBitField(unsigned int  num);
