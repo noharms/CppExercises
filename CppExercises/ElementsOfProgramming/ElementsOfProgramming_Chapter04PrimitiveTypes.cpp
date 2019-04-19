@@ -80,6 +80,12 @@ void ElementsOfProgrammingChapter04PrimitiveTypes() {
   std::cout << "-- Exercise: Find closest same weight int " << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter04PrimitiveTypes_FindClosestSameWeightInteger(number);
+  
+  //--------- Exercise: Multiplication by bitwise operations
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Multiplication by bitwise operatiosn " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_MultiplicationByBitwiseOperations();
 
   ////--------- exercise: compute parity - using unsetlowestsetbit
   //std::cout << "------------------------------" << std::endl;
@@ -321,6 +327,30 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_FindClosestSameWeightInteger(u
   return;
 }
 
+/*
+  Exercise description:
+
+  Implement your own version of a multiplication of two nonnegative integers using only bitwise operations,
+  &, |, ~, ^, >>, << 
+  and assignment operators. In particular, you are not allowed to use arithmetic operators, +, -, * 
+ */
+void ElementsOfProgrammingChapter04PrimitiveTypes_MultiplicationByBitwiseOperations() {
+
+  // get two small random numbers (they must be < 2^16, since the result can maximally be 2^32-1)
+  uint16_t number1 = rand() % std::numeric_limits<uint16_t>::max();
+  uint16_t number2 = rand() % std::numeric_limits<uint16_t>::max();
+  std::cout << "Multiplying " << number1 << " * " << number2 << std::endl;
+  
+  // compute the product
+  uint32_t product = BitwiseMultiplication(number1, number2);
+
+  // output the result
+  std::cout << "Bitwise implementation yields: " << product << std::endl;
+  std::cout << "Built-in multiplication yields: " << number1 * number2 << std::endl;
+
+  return;
+}
+
 //---------------------------- Parity Exercises
 /*
     Exercise description:
@@ -330,7 +360,6 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_FindClosestSameWeightInteger(u
 
     E.g:   0110 1010 -> parity 0, because #1 is even
            1110 1010 -> parity 1, because #1 is odd
-
 
 ´*/
 void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityPerDefinition(uint32_t number) {
@@ -459,7 +488,6 @@ uint32_t FindLowestUnsetBit(uint32_t num) {
   return ((num ^ (num + 0x1u)) + 0x1u) >> 1;
 }
 
-
 /*
   the idea is that  subtracting 1 from a bit-field will give a bit-field
   which has unset the lowest-set bit and instead 1's in all lesser bits.
@@ -472,6 +500,40 @@ uint32_t RightPropagateLowestSetBit(uint32_t number) {
   else {
     std::cout << "No Bit is set. Nothing is done here." << std::endl;
     return number;
+  }
+}
+
+/*
+  the idea is to right-shift until a 1 appears at the lsb,  -> O(n) algo
+*/
+int PositionOfLowestSetBit(uint32_t number) {
+  if (number == 0x0u) {
+    return -1; // no bit is set
+  }
+  else {
+    int pos = 0;
+    while ((number & 0x1u) == 0x0u) {
+      number >>= 1;
+      ++pos;
+    }
+    return pos;
+  }  
+}
+
+/*
+  the idea is to right-shift until a 0 appears at the lsb,  -> O(n) algo
+*/
+int PositionOfLowestUnsetBit(uint32_t number) {
+  if (number == ~0x0u) {
+    return -1; // all bits are set
+  }
+  else {
+    int pos = 0;
+    while ((number & 0x1u) == 0x1u) {
+      number >>= 1;
+      ++pos;
+    }
+    return pos;
   }
 }
 
@@ -622,6 +684,106 @@ uint32_t FindClosestSameWeightIntegerOrder1Algo(uint32_t number) {
     const uint32_t kMaskLowestUnsetBit = FindLowestUnsetBit(number);
     return number ^ (kMaskLowestUnsetBit | (kMaskLowestUnsetBit >> 1));
   }
+}
+
+/*
+  the idea for bitwise implementation of multiplication (no +,*,-,/ allowed) is:
+
+  when multiplying multiple-digit numbers one basically
+  takes the one number multiplies it with each digit of the other number and adds up
+  the results. this holds for multiplication in binary as well as in decimal base.
+
+  key insights:
+    - we can imitate multiplications by 2^n by leftshift of the bitfield by n.
+    - we can imitate addition of two bitfields by OR of the bitfields
+      plus a certain procedure to account for bits present in both fields
+  
+  So one basically needs a loop over all bits in bitfield2:
+
+    temporary_result = 0
+    foreach bit in bitfield2:
+      addition = leftshift bitfield1 by the corresponding shift
+      add addition to temporary result
+      
+  e.g.  5 * 10 = 50
+                                           0101 * 1010 
+    --> bit at 2^1 in bitfield2:           1010
+    --> bit at 2^3 in bitfield2:   +  0010 1000 
+    --------------------------------------------------
+                                      0011 0010 = 50
+
+  The problem is the implementation of the + of the two bitfields using only
+  bitwise operations:
+  While a simple OR of the two bitfields will almost bring the 
+  result, it fails if both bitfields have a 1 at the same position.
+  In that case one needs to flip the bit to 0 and instead switch
+  on the following bit. However, if the next bit is already a 1,
+  again this 1 has to become a 0 and the next one has to be flipped on.
+  
+*/
+uint32_t BitwiseMultiplication(uint16_t x, uint16_t y) {
+
+  // TODO: handle 0's
+
+  uint32_t result = 0x0u;
+  uint32_t x_32 = (uint32_t)x;
+  uint32_t y_32 = (uint32_t)y;
+
+  while (y_32) {
+    int pos_lowest_set_bit_y = PositionOfLowestSetBit(y_32);  // O(n)    
+    uint32_t summand = x_32 << pos_lowest_set_bit_y;
+
+    // save those bits that are present in both: they need special treatment
+    // when adding them up
+    uint32_t bits_problematic = result & summand;
+        
+    // 1. ADDITION OF UNPROBLEMATIC BITS 
+    result = result | summand;
+
+    // 2. ADDITION OF THE PROBLEMATIC BITS 
+    // if a power of 2 appears in both the result and the new summand,
+    // one of them is not taken care of when doing the OR in step 1.
+    while (bits_problematic) {
+      int pos_lowest_problematic = PositionOfLowestSetBit(bits_problematic);  // O(n)
+      int offset_next_free_slot = PositionOfLowestUnsetBit(result >> pos_lowest_problematic);
+      // unset the 1's, set the 1 at the next free slot
+      uint32_t mask_problematic_bit = (0x1u << pos_lowest_problematic);
+      uint32_t mask_free_bit = (0x1u << pos_lowest_problematic) << offset_next_free_slot;
+      while (mask_problematic_bit != mask_free_bit) {  // move the "pointer" to the problematic bit until free slot
+        result = result & (~mask_problematic_bit); // set 0 at the problematic bit
+        mask_problematic_bit <<= 1;
+      }
+      result = result | mask_free_bit;
+      // the lowest one of the problematic bits has now been taken care of in the result,
+      // so cut it from the problematic ones
+      bits_problematic &= ~(0x1u << pos_lowest_problematic); 
+               
+      // since several 1's in the result may have been set 0 (at least one),
+      // we need to re-check which bits remain problematic at all !
+      // possibly some of the problematic bits are now already free and can simply be set!
+      // e.g.   
+      //           result    = 0111 0101 
+      //           summand   = 0111 0010
+      //  result | summand   = 0111 0111
+      // -> problematic bits = 0111 0000
+      // after adding the first of the problematic bits: 
+      //           result    = 1000 0111
+      // -> so now the other problematic bits could simply be added already !
+      //
+      // 1. check again which bits are still problematic
+      uint32_t bits_problematic_still = result & bits_problematic;
+      // 2. get the now unproblematic bits from the summand into the result by OR
+      result = result | bits_problematic;
+
+      // continue with the sill problematic bits
+      bits_problematic = bits_problematic_still;
+    }
+
+    // this bit of y has been processed in the multiplication: unset it
+    y_32 = UnsetLowestSetBit(y_32);
+  }
+
+  return result;
 }
 
 //----------- Parity computations
