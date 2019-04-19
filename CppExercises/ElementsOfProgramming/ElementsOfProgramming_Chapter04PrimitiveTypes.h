@@ -46,6 +46,7 @@ uint32_t ComputeModulus2ton(uint32_t number, const int exponent);
 uint32_t FindClosestSameWeightInteger(uint32_t number);
 uint32_t FindClosestSameWeightIntegerOrder1Algo(uint32_t number);
 
+uint32_t BitwiseAddition(uint32_t num1, uint32_t num2);
 uint32_t BitwiseMultiplication(uint16_t x, uint16_t y);
 
 bool ComputeParityPerDefinition(uint32_t num);

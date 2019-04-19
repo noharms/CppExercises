@@ -712,13 +712,6 @@ uint32_t FindClosestSameWeightIntegerOrder1Algo(uint32_t number) {
     --------------------------------------------------
                                       0011 0010 = 50
 
-  The problem is the implementation of the + of the two bitfields using only
-  bitwise operations:
-  While a simple OR of the two bitfields will almost bring the 
-  result, it fails if both bitfields have a 1 at the same position.
-  In that case one needs to flip the bit to 0 and instead switch
-  on the following bit. However, if the next bit is already a 1,
-  again this 1 has to become a 0 and the next one has to be flipped on.
   
 */
 uint32_t BitwiseMultiplication(uint16_t x, uint16_t y) {
@@ -732,55 +725,81 @@ uint32_t BitwiseMultiplication(uint16_t x, uint16_t y) {
   while (y_32) {
     int pos_lowest_set_bit_y = PositionOfLowestSetBit(y_32);  // O(n)    
     uint32_t summand = x_32 << pos_lowest_set_bit_y;
-
-    // save those bits that are present in both: they need special treatment
-    // when adding them up
-    uint32_t bits_problematic = result & summand;
-        
-    // 1. ADDITION OF UNPROBLEMATIC BITS 
-    result = result | summand;
-
-    // 2. ADDITION OF THE PROBLEMATIC BITS 
-    // if a power of 2 appears in both the result and the new summand,
-    // one of them is not taken care of when doing the OR in step 1.
-    while (bits_problematic) {
-      int pos_lowest_problematic = PositionOfLowestSetBit(bits_problematic);  // O(n)
-      int offset_next_free_slot = PositionOfLowestUnsetBit(result >> pos_lowest_problematic);
-      // unset the 1's, set the 1 at the next free slot
-      uint32_t mask_problematic_bit = (0x1u << pos_lowest_problematic);
-      uint32_t mask_free_bit = (0x1u << pos_lowest_problematic) << offset_next_free_slot;
-      while (mask_problematic_bit != mask_free_bit) {  // move the "pointer" to the problematic bit until free slot
-        result = result & (~mask_problematic_bit); // set 0 at the problematic bit
-        mask_problematic_bit <<= 1;
-      }
-      result = result | mask_free_bit;
-      // the lowest one of the problematic bits has now been taken care of in the result,
-      // so cut it from the problematic ones
-      bits_problematic &= ~(0x1u << pos_lowest_problematic); 
-               
-      // since several 1's in the result may have been set 0 (at least one),
-      // we need to re-check which bits remain problematic at all !
-      // possibly some of the problematic bits are now already free and can simply be set!
-      // e.g.   
-      //           result    = 0111 0101 
-      //           summand   = 0111 0010
-      //  result | summand   = 0111 0111
-      // -> problematic bits = 0111 0000
-      // after adding the first of the problematic bits: 
-      //           result    = 1000 0111
-      // -> so now the other problematic bits could simply be added already !
-      //
-      // 1. check again which bits are still problematic
-      uint32_t bits_problematic_still = result & bits_problematic;
-      // 2. get the now unproblematic bits from the summand into the result by OR
-      result = result | bits_problematic;
-
-      // continue with the sill problematic bits
-      bits_problematic = bits_problematic_still;
-    }
-
+    result = BitwiseAddition(result, summand);  // O(n^2)
+    
     // this bit of y has been processed in the multiplication: unset it
     y_32 = UnsetLowestSetBit(y_32);
+  }
+
+  return result;
+}
+
+/*
+  idea: for many cases a bitwise addition of num1 and num2 is very simple
+
+  just do OR:           1 + 2    = 3
+              -->    0001 | 0010 = 0011 
+
+  However, care has to be taken, when the same bits appear in both numbers!
+
+                        2 + 2    = 4
+             -->     0010 | 0010 = 0010  ! one 2 was lost !
+
+  While a simple OR of the two bitfields will almost bring the
+  result, it fails if both bitfields have a 1 at the same position.
+  In that case one needs to flip the bit to 0 and instead switch
+  on the following bit. However, if the next bit is already a 1,
+  again this 1 has to become a 0 and the next one has to be flipped on.
+
+*/
+uint32_t BitwiseAddition(uint32_t num1, uint32_t num2) {
+
+  uint32_t result = 0x0u;
+
+  // save those bits that are present in both: they need special treatment
+  // when adding them up
+  uint32_t bits_problematic = num1 & num2;
+
+  // 1. ADDITION OF UNPROBLEMATIC BITS 
+  result = num1 | num2;
+
+  // 2. ADDITION OF THE PROBLEMATIC BITS 
+  // if a power of 2 appears in both the result and the new summand,
+  // one of them is not taken care of when doing the OR in step 1.
+  while (bits_problematic) {
+    int pos_lowest_problematic = PositionOfLowestSetBit(bits_problematic);  // O(n)
+    int offset_next_free_slot = PositionOfLowestUnsetBit(result >> pos_lowest_problematic);
+    // unset the 1's, set the 1 at the next free slot
+    uint32_t mask_problematic_bit = (0x1u << pos_lowest_problematic);
+    uint32_t mask_free_bit = (0x1u << pos_lowest_problematic) << offset_next_free_slot;
+    while (mask_problematic_bit != mask_free_bit) {  // move the "pointer" to the problematic bit until free slot
+      result = result & (~mask_problematic_bit); // set 0 at the problematic bit
+      mask_problematic_bit <<= 1;
+    }
+    result = result | mask_free_bit;
+    // the lowest one of the problematic bits has now been taken care of in the result,
+    // so cut it from the problematic ones
+    bits_problematic &= ~(0x1u << pos_lowest_problematic);
+
+    // since several 1's in the result may have been set 0 (at least one),
+    // we need to re-check which bits remain problematic at all !
+    // possibly some of the problematic bits are now already free and can simply be set!
+    // e.g.   
+    //           result    = 0111 0101 
+    //           summand   = 0111 0010
+    //  result | summand   = 0111 0111
+    // -> problematic bits = 0111 0000
+    // after adding the first of the problematic bits: 
+    //           result    = 1000 0111
+    // -> so now the other problematic bits could simply be added already !
+    //
+    // 1. check again which bits are still problematic
+    uint32_t bits_problematic_still = result & bits_problematic;
+    // 2. get the now unproblematic bits from the summand into the result by OR
+    result = result | bits_problematic;
+
+    // continue with the sill problematic bits
+    bits_problematic = bits_problematic_still;
   }
 
   return result;
