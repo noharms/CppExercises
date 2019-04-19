@@ -5,7 +5,8 @@
 void ElementsOfProgrammingChapter04PrimitiveTypes();
 
 void ElementsOfProgrammingChapter04PrimitiveTypes_UnsetLowestSetBit(uint32_t number);
-void ElementsOfProgrammingChapter04PrimitiveTypes_IsolateLowestSetBit(uint32_t number);
+void ElementsOfProgrammingChapter04PrimitiveTypes_FindLowestSetBit(uint32_t number);
+void ElementsOfProgrammingChapter04PrimitiveTypes_FindLowestUnsetBit(uint32_t number);
 void ElementsOfProgrammingChapter04PrimitiveTypes_RightPropagateLowestSetBit(uint32_t number);
 
 void ElementsOfProgrammingChapter04PrimitiveTypes_SwapBits(uint32_t number);
@@ -25,7 +26,8 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingDivideAndCon
 
 
 uint32_t UnsetLowestSetBit(uint32_t  num);
-uint32_t IsolateLowestSetBit(uint32_t  num);
+uint32_t FindLowestSetBit(uint32_t  num);
+uint32_t FindLowestUnsetBit(uint32_t num);
 uint32_t RightPropagateLowestSetBit(uint32_t number);
 
 uint32_t SwapBits(uint32_t number, const int i, const int j);
@@ -38,6 +40,7 @@ bool TestPowerOf2(uint32_t number);
 uint32_t ComputeModulus2ton(uint32_t number, const int exponent);
 
 uint32_t FindClosestSameWeightInteger(uint32_t number);
+uint32_t FindClosestSameWeightIntegerOrder1Algo(uint32_t number);
 
 bool ComputeParityPerDefinition(uint32_t num);
 bool ComputeParityUsingUnsetLowestSetBit(uint32_t  num);

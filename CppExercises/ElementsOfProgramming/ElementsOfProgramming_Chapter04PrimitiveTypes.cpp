@@ -32,9 +32,15 @@ void ElementsOfProgrammingChapter04PrimitiveTypes() {
 
   //--------- Exercise: Isolate Lowest-set-bit
   std::cout << "------------------------------" << std::endl;
-  std::cout << "-- Exercise: isolate lowes set bit: " << std::endl;
+  std::cout << "-- Exercise: Find lowest set bit: " << std::endl;
   std::cout << "------------------------------" << std::endl;
-  ElementsOfProgrammingChapter04PrimitiveTypes_IsolateLowestSetBit(number);
+  ElementsOfProgrammingChapter04PrimitiveTypes_FindLowestSetBit(number);
+  
+  //--------- Exercise: Mark Lowest-Unset-bit
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Find lowest unset bit: " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_FindLowestUnsetBit(number);
   
   //--------- Exercise: Right-propagate the lowest-set-bit
   std::cout << "------------------------------" << std::endl;
@@ -137,22 +143,45 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_UnsetLowestSetBit(uint32_t num
 /*
     Exercise description:
 
-    Assume you are given a bit-field, say an integer for simplicity.
+    Assume you are given a bit-field
     -> isolate the lowermost-set-bit
 
     E.g:   0110 1010 -> 0000 0010
 
 */
-void ElementsOfProgrammingChapter04PrimitiveTypes_IsolateLowestSetBit(uint32_t number) {
+void ElementsOfProgrammingChapter04PrimitiveTypes_FindLowestSetBit(uint32_t number) {
 
   // print the bits of the number
   PrintIntegerAsBitField(number);
 
   // unset the lowermost set bit
-  number = IsolateLowestSetBit(number);
+  number = FindLowestSetBit(number);
 
   // Print the bits of the modified number
   PrintIntegerAsBitField(number);
+
+  return;
+}
+
+/*
+    Exercise description:
+
+    Assume you are given a bit-field
+    -> mark the lowest unset bit in new bitmask
+
+    e.g.  1001 0111 -> 0000 1000
+
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_FindLowestUnsetBit(uint32_t number) {
+
+  // print the bits of the number
+  PrintIntegerAsBitField(number);
+
+  // unset the lowermost set bit
+  const uint32_t kBitMaskLowestUnsetBit = FindLowestUnsetBit(number);
+
+  // Print the bits of the modified number
+  PrintIntegerAsBitField(kBitMaskLowestUnsetBit);
 
   return;
 }
@@ -283,7 +312,8 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_FindClosestSameWeightInteger(u
   PrintIntegerAsBitField(number);
 
   // compute the parity
-  uint32_t closestsameweightnumber = FindClosestSameWeightInteger(number);
+  //uint32_t closestsameweightnumber = FindClosestSameWeightInteger(number);
+  uint32_t closestsameweightnumber = FindClosestSameWeightIntegerOrder1Algo(number);
 
   // print the bits of the number
   PrintIntegerAsBitField(closestsameweightnumber);
@@ -404,11 +434,31 @@ uint32_t UnsetLowestSetBit(uint32_t  num) {
 }
 
 /**
-    Isolate the lowest set bit of an intege
+    Isolate the lowest set bit of an integer
+
+    idea:  x    = 1001 1000
+           x-1  = 1001 0111
+         ~(x-1) = 0110 1000
+     x & ~(x-1) = 0000 1000
+       
 */
-uint32_t IsolateLowestSetBit(uint32_t  num) {
+uint32_t FindLowestSetBit(uint32_t  num) {
   return num & (~(num - 1));
 }
+
+/*
+  Isolate the lowest unset bit of a bitfield
+
+  idea:    x               = 1010 0111
+           x+1             = 1010 1000
+        x^(x+1)            = 0000 1111
+       (x^(x+1)) + 1       = 0001 0000
+      ((x^(x+1)) + 1) >> 1 = 0000 1000
+*/
+uint32_t FindLowestUnsetBit(uint32_t num) {
+  return ((num ^ (num + 0x1u)) + 0x1u) >> 1;
+}
+
 
 /*
   the idea is that  subtracting 1 from a bit-field will give a bit-field
@@ -542,6 +592,36 @@ uint32_t FindClosestSameWeightInteger(uint32_t number) {
     const uint32_t kMaskBitAtCounterAndNext= (0x1u << counter) | (0x1u << (counter - 1));
     return number ^ kMaskBitAtCounterAndNext;
   }  
+}
+
+/*
+  the idea is that we need to find the two least significant bits that
+  are different from another and then flip them.
+
+  in the above algorithm we tried to find these two by traversing the bits,
+  one by one, which is obviously linear.
+
+  in order to improve that we need to find operations that yield the two bits
+  automatically, without traversal. this can be done with the help of a
+  case distinction:
+
+    if the LSB is 0, then we need to find the first 1, which is easily doable
+    (FindLowestSetBit is O(1)). 
+    if the LSB is 1, then we need to find the first 0, which is as well easily
+    doable (FindLowestUnsetBit is O(1))
+*/
+uint32_t FindClosestSameWeightIntegerOrder1Algo(uint32_t number) {
+
+  const bool val_lsb = (number & 0x1u);
+
+  if (val_lsb == 0) {
+    const uint32_t kMaskLowestSetBit = FindLowestSetBit(number);
+    return number ^ (kMaskLowestSetBit | (kMaskLowestSetBit >> 1));
+  }
+  else {
+    const uint32_t kMaskLowestUnsetBit = FindLowestUnsetBit(number);
+    return number ^ (kMaskLowestUnsetBit | (kMaskLowestUnsetBit >> 1));
+  }
 }
 
 //----------- Parity computations
