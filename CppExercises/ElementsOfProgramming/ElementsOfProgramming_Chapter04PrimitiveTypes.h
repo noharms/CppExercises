@@ -19,7 +19,10 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeModulus2ton(uint32_t nu
 
 void ElementsOfProgrammingChapter04PrimitiveTypes_FindClosestSameWeightInteger(uint32_t number);
 
+void ElementsOfProgrammingChapter04PrimitiveTypes_AdditionByBitwiseOperations();
 void ElementsOfProgrammingChapter04PrimitiveTypes_MultiplicationByBitwiseOperations();
+void ElementsOfProgrammingChapter04PrimitiveTypes_SubstractionByBitwiseOperations();
+void ElementsOfProgrammingChapter04PrimitiveTypes_DivisionByBitwiseOperations();
 
 void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityPerDefinition(uint32_t number);
 void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingLowestSetBit(uint32_t number);
@@ -47,7 +50,12 @@ uint32_t FindClosestSameWeightInteger(uint32_t number);
 uint32_t FindClosestSameWeightIntegerOrder1Algo(uint32_t number);
 
 uint32_t BitwiseAddition(uint32_t num1, uint32_t num2);
+uint32_t BitwiseAdditionSchoolAlgorithm(uint32_t num1, uint32_t num2);
+uint32_t BitwiseAdditionSchoolAlgorithmNicer(uint32_t num1, uint32_t num2);
 uint32_t BitwiseMultiplication(uint16_t x, uint16_t y);
+uint32_t BitwiseSubstraction(uint32_t num1, uint32_t num2);
+uint32_t BitwiseDivision(uint32_t num1, uint32_t num2);
+
 
 bool ComputeParityPerDefinition(uint32_t num);
 bool ComputeParityUsingUnsetLowestSetBit(uint32_t  num);

@@ -13,10 +13,30 @@
 #include <cmath>
 
 void ElementsOfProgrammingChapter04PrimitiveTypes() {
+
+  std::unordered_map<int, int> mymap = { {1, 2} };  
+  std::unordered_map<int, int> mymap2 = { {5, 25}, { 7, 49 } };
+  //mymap2.emplace(4, 16);
+  mymap2.at(5) = 3;
+  mymap = mymap2;
+  int myval = mymap.at(5);
+  std::cout << myval << std::endl;
+
+  const std::vector<int> myvec = { 4,5,6 };
+  std::vector<int> vec2 = { 1 };
+  vec2 = myvec;
+  //myvec[2] = 3;
+  std::cout << vec2[2] << std::endl;
+
+  int x = 1;
+  const int y = 2;
+  std::pair<int, int> mypair = { x, y };
+  std::pair<int, int> pair2 = { 3, 33 };
+  mypair = pair2;  
+  mypair.second = 4;
   
   std::cout << "-- Entering ElementsOfProgrammingChapter04PrimitiveTypes " << std::endl;
-
-
+  
   // creating larger random numbers than simple rand()
   std::random_device rd;   // non-deterministic generator
   std::mt19937 gen(rd());  // to seed mersenne twister.  
@@ -80,12 +100,30 @@ void ElementsOfProgrammingChapter04PrimitiveTypes() {
   std::cout << "-- Exercise: Find closest same weight int " << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter04PrimitiveTypes_FindClosestSameWeightInteger(number);
-  
+
+  //--------- Exercise: Addition by bitwise operations
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Addition by bitwise operatiosn " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_AdditionByBitwiseOperations();
+
   //--------- Exercise: Multiplication by bitwise operations
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: Multiplication by bitwise operatiosn " << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter04PrimitiveTypes_MultiplicationByBitwiseOperations();
+  
+  //--------- Exercise: Substraction by bitwise operations
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Substraction by bitwise operations " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_SubstractionByBitwiseOperations();
+  
+  //--------- Exercise: Substraction by bitwise operations
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Substraction by bitwise operations " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_DivisionByBitwiseOperations();
 
   ////--------- exercise: compute parity - using unsetlowestsetbit
   //std::cout << "------------------------------" << std::endl;
@@ -330,6 +368,32 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_FindClosestSameWeightInteger(u
 /*
   Exercise description:
 
+  Implement your own version of a addition of two nonnegative integers using only bitwise operations,
+  &, |, ~, ^, >>, <<
+  and assignment operators. In particular, you are not allowed to use arithmetic operators, +, -, *
+ */
+void ElementsOfProgrammingChapter04PrimitiveTypes_AdditionByBitwiseOperations() {
+
+  // get two small random numbers (they must be < 2^16, since the result can maximally be 2^32-1)
+  uint16_t number1 = rand() % std::numeric_limits<uint16_t>::max();
+  uint16_t number2 = rand() % std::numeric_limits<uint16_t>::max();
+  std::cout << "Adding up " << number1 << " + " << number2 << std::endl;
+
+  // compute the sum
+  //uint32_t sum = BitwiseAddition(number1, number2);
+  //uint32_t sum = BitwiseAdditionSchoolAlgorithm(number1, number2);
+  uint32_t sum = BitwiseAdditionSchoolAlgorithmNicer(number1, number2);
+
+  // output the result
+  std::cout << "Bitwise implementation yields: " << sum << std::endl;
+  std::cout << "Built-in addition yields: " << number1 + number2 << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
   Implement your own version of a multiplication of two nonnegative integers using only bitwise operations,
   &, |, ~, ^, >>, << 
   and assignment operators. In particular, you are not allowed to use arithmetic operators, +, -, * 
@@ -342,11 +406,64 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_MultiplicationByBitwiseOperati
   std::cout << "Multiplying " << number1 << " * " << number2 << std::endl;
   
   // compute the product
-  uint32_t product = BitwiseMultiplication(number1, number2);
+  uint32_t product = BitwiseMultiplication(number1, number2);  
 
   // output the result
   std::cout << "Bitwise implementation yields: " << product << std::endl;
   std::cout << "Built-in multiplication yields: " << number1 * number2 << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:  bitwise substraction
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_SubstractionByBitwiseOperations() {
+
+  // get two small random numbers (they must be < 2^16, since the result can maximally be 2^32-1)
+  srand(time(NULL));
+  uint16_t number1 = rand() % std::numeric_limits<uint16_t>::max();
+  uint16_t number2 = rand() % std::numeric_limits<uint16_t>::max();
+  if (number2 > number1) {
+    uint16_t temp = number2;
+    number2 = number1;
+    number1 = temp;
+  }
+  std::cout << "Subtracting:" << number1 << " - " << number2 << std::endl;
+
+  // compute the difference
+  uint32_t difference = BitwiseSubstraction(number1, number2);
+
+  // output the result
+  std::cout << "Bitwise implementation yields: " << difference << std::endl;
+  std::cout << "Built-in multiplication yields: " << number1 - number2 << std::endl;
+
+  return;
+}
+
+
+/*
+  Exercise description: bitwise division
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_DivisionByBitwiseOperations() {
+
+  // get two small random numbers (they must be < 2^16, since the result can maximally be 2^32-1)
+  srand(time(NULL));
+  uint16_t number1 = rand() % std::numeric_limits<uint16_t>::max();
+  uint16_t number2 = rand() % std::numeric_limits<uint16_t>::max();
+  if (number2 > number1) {
+    uint16_t temp = number2;
+    number2 = number1;
+    number1 = temp;
+  }
+  std::cout << "Division:" << number1 << " / " << number2 << std::endl;
+
+  // compute the difference
+  uint32_t quotient = BitwiseDivision(number1, number2);
+
+  // output the result
+  std::cout << "Bitwise implementation yields: " << quotient << std::endl;
+  std::cout << "Built-in multiplication yields: " << number1 / number2 << std::endl;
 
   return;
 }
@@ -690,8 +807,13 @@ uint32_t FindClosestSameWeightIntegerOrder1Algo(uint32_t number) {
   the idea for bitwise implementation of multiplication (no +,*,-,/ allowed) is:
 
   when multiplying multiple-digit numbers one basically
-  takes the one number multiplies it with each digit of the other number and adds up
-  the results. this holds for multiplication in binary as well as in decimal base.
+  takes the one number, multiplies it with each digit of the other number and adds up
+  the results. this holds for multiplication in binary as well as in decimal base:
+
+  1010 * 0111 = 1010 * (0001 +  0010 + 0100)
+              = 1010 * 0001 + 1010 * 0010 + 1010 * 0100
+
+  These are just several multiplications of a bitfield by a power of 2, added up !
 
   key insights:
     - we can imitate multiplications by 2^n by leftshift of the bitfield by n.
@@ -723,7 +845,7 @@ uint32_t BitwiseMultiplication(uint16_t x, uint16_t y) {
   uint32_t y_32 = (uint32_t)y;
 
   while (y_32) {
-    int pos_lowest_set_bit_y = PositionOfLowestSetBit(y_32);  // O(n)    
+    int pos_lowest_set_bit_y = PositionOfLowestSetBit(y_32);  // can be done in O(1)    
     uint32_t summand = x_32 << pos_lowest_set_bit_y;
     result = BitwiseAddition(result, summand);  // O(n^2)
     
@@ -803,6 +925,124 @@ uint32_t BitwiseAddition(uint32_t num1, uint32_t num2) {
   }
 
   return result;
+}
+
+/*
+  Addition of two numbers can be done with the algorithm that we learn in school:
+  if the addition of two digits is larger than the base, carry over an additional
+  one to the next power and add it there two the two summands
+
+                0011 0101   = 53
+              + 0001 1100   = 28
+  carryover      111 1
+  ------------------------
+                0101 0001   = 81
+
+
+  -> simple loop through the bits, O(n)
+*/
+uint32_t BitwiseAdditionSchoolAlgorithm(uint32_t num1, uint32_t num2) {
+
+  uint32_t result = 0x0u;
+  uint32_t mask_get_next_bit = 0x1u;
+  uint32_t carry_in = 0x0u;
+  uint32_t carry_out = 0x0u;
+
+  while (mask_get_next_bit) {
+    const uint32_t bit_num1 = num1 & mask_get_next_bit;
+    const uint32_t bit_num2 = num2 & mask_get_next_bit;
+    carry_out = (bit_num1 & bit_num2) | (bit_num1 & carry_in) | (bit_num2 & carry_in);
+    if (carry_out == 0x1u << 31) {
+      // overflow error: we only have 32 bits, so from position 31 we cannot carry out
+    }
+    else {
+      carry_out <<= 1;
+    }    
+    result = result | (bit_num1 ^ bit_num2 ^ carry_in);     
+    carry_in = carry_out;
+    mask_get_next_bit <<= 1;
+  }
+
+  return result;
+}
+
+/*
+  Addition :   "CARRYOVER BITS"
+*/
+uint32_t BitwiseAdditionSchoolAlgorithmNicer(uint32_t num1, uint32_t num2) {
+  uint32_t partial_sum = 0x0u;
+  uint32_t carryover_bits = 0x0u;
+  // repeated addition until now carryover_bits exist
+  do {
+    partial_sum = num1 ^ num2;
+    carryover_bits = (num1 & num2) << 1;
+    num2 = carryover_bits;
+    num1 = partial_sum;
+  } while (carryover_bits);
+  return partial_sum;
+}
+
+/*
+  Substraction:   "BORROW BITS"
+
+  substraction is difficult if you want to substract a 1 bit from a 0 bit because
+  this has an effect on other bits. 
+
+  -> the key trick is: to exploit the fact that we substract the smaller from
+  the bigger number (wlog), so we know that somewhere there must come a 1 bit to substract from.
+
+  thus if  2^k bit is 0 in Minuend, but 1 in Subtrahend:
+
+    1. add 2^k to the Minuend instead of subtracting it
+    2. note that we have a 2*2^k = 2^(k+1) "debt", i.e. try another subtraction of the 2^(k+1) bit
+    3. if in (k+1) bit the same problem exists, iterate until a 1 is found in Minuend
+*/
+uint32_t BitwiseSubstraction(uint32_t num1, uint32_t num2) {  // O(n), think of 1000 - 0001
+  // assume wlog num1 >= num2..
+
+  uint32_t subtstractiondebt = 0x0u;
+  while (num2 != subtstractiondebt) {
+
+    // find out the problematic bits, for which we take a "debt" and subtract twice later
+    subtstractiondebt = (~num1) & num2;
+
+    // subtract 1's if they exist in Minuend and Subtrahend, leave 1's that are only in Minuend
+    // and add 1's that are only in Subtrahend
+    num1 = num1 ^ num2;
+
+    // do another round of subtration with twice of the problematic bits to get rid off the debts
+    num2 = subtstractiondebt << 1;
+  }
+
+  return num1;
+}
+
+/*
+  idea: 
+
+  division means: count the number of times you can 
+                  substract the divisor from the dividend
+
+  that's almost all for the algorithm, except we can work in orders of magnitude
+  of the divisor to avoid countless subtraction of the same divisor:
+
+  check if the divisor fits once, if yes, check if also twice, if yes, also thrice and so on.
+
+*/
+uint32_t BitwiseDivision(uint32_t num1, uint32_t num2) {  
+  uint32_t quotient = 0x0u;
+  while (num1 >= num2) {
+    uint32_t powerof2_that_num2_fits_in_num1 = 0x1u;
+    uint32_t powerof2_times_num2 = num2;
+    while ( num1 > (powerof2_times_num2 << 1) ) {
+      powerof2_times_num2 <<= 1;
+      powerof2_that_num2_fits_in_num1 <<= 1;
+    }
+    // num2*2^(k+1) would not fit, so substract num2*2^k and continue
+    num1 = num1 - powerof2_times_num2; // NOTE: use bitwise substract to be fully bitwise
+    quotient |= powerof2_that_num2_fits_in_num1;
+  }
+  return quotient;
 }
 
 //----------- Parity computations
