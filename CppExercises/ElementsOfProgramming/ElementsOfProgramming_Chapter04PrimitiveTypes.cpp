@@ -13,28 +13,8 @@
 #include <cmath>
 
 void ElementsOfProgrammingChapter04PrimitiveTypes() {
-
-  std::unordered_map<int, int> mymap = { {1, 2} };  
-  std::unordered_map<int, int> mymap2 = { {5, 25}, { 7, 49 } };
-  //mymap2.emplace(4, 16);
-  mymap2.at(5) = 3;
-  mymap = mymap2;
-  int myval = mymap.at(5);
-  std::cout << myval << std::endl;
-
-  const std::vector<int> myvec = { 4,5,6 };
-  std::vector<int> vec2 = { 1 };
-  vec2 = myvec;
-  //myvec[2] = 3;
-  std::cout << vec2[2] << std::endl;
-
-  int x = 1;
-  const int y = 2;
-  std::pair<int, int> mypair = { x, y };
-  std::pair<int, int> pair2 = { 3, 33 };
-  mypair = pair2;  
-  mypair.second = 4;
   
+  srand((unsigned int)time(NULL));
   std::cout << "-- Entering ElementsOfProgrammingChapter04PrimitiveTypes " << std::endl;
   
   // creating larger random numbers than simple rand()
@@ -69,6 +49,13 @@ void ElementsOfProgrammingChapter04PrimitiveTypes() {
   // make sure the last three bits are 0s
   const uint32_t kMask_LastThreeBits = (0x1u << 2) | (0x1u << 1) | (0x1u);
   ElementsOfProgrammingChapter04PrimitiveTypes_RightPropagateLowestSetBit(number & (~kMask_LastThreeBits));
+
+
+  //--------- Exercise: Right-propagate the lowest-set-bit
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Right-propagate the highest-set-bit " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_RightPropagateHighestSetBit(number);
   
   //--------- Exercise: Swap two bits
   std::cout << "------------------------------" << std::endl;
@@ -125,6 +112,30 @@ void ElementsOfProgrammingChapter04PrimitiveTypes() {
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter04PrimitiveTypes_DivisionByBitwiseOperations();
 
+  //--------- Exercise: Compute the integer power of a double
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Compute x^k, where x double, k integer " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_ComputeIntegerPower();
+
+  //--------- Exercise: Reverse decimal digits
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Reverse decimal digits " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_ReverseDecimalDigits(number);
+  
+  //--------- Exercise: Check if decimal digits form a palindrome
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Decimal Palindrome " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_DecimalPalindrome(123595321);
+  
+  //--------- Exercise: Create uniform random number generator on 0..n, having a coin
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Create uniform random number generator from coin " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_UniformRandomNumberFromCoin();
+
   ////--------- exercise: compute parity - using unsetlowestsetbit
   //std::cout << "------------------------------" << std::endl;
   //std::cout << "-- exercise: compute parity: basic " << std::endl;
@@ -143,11 +154,12 @@ void ElementsOfProgrammingChapter04PrimitiveTypes() {
   //std::cout << "------------------------------" << std::endl;
   //elementsofprogrammingchapter04primitivetypes_computeparityusinglookuptable(number);
   //
-  ////--------- exercise: compute parity - using divide and conquer
-  //std::cout << "------------------------------" << std::endl;
-  //std::cout << "-- exercise: compute parity using divide and conquer " << std::endl;
-  //std::cout << "------------------------------" << std::endl;
-  //elementsofprogrammingchapter04primitivetypes_computeparityusingdivideandconquer(number);
+
+  //--------- exercise: compute parity - using divide and conquer
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- exercise: compute parity using divide and conquer " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingDivideAndConquer(number);
   
 
   return;
@@ -244,6 +256,29 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_RightPropagateLowestSetBit(uin
 
   // compute the parity
   uint32_t modified_number = RightPropagateLowestSetBit(number);
+
+  // print the bits of the number
+  PrintIntegerAsBitField(modified_number);
+
+  return;
+}
+
+/*
+    Exercise description:
+  
+    Given a bit-field right-propagate the highest-set bit, i.e. fill all 0s
+    after that bit with 1's.
+
+    E.g.:   0010 1001 -> 0011 1111
+   
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_RightPropagateHighestSetBit(uint32_t number) {
+
+  // print the bits of the number
+  PrintIntegerAsBitField(number);
+
+  // compute the parity
+  uint32_t modified_number = RightPropagateHighestSetBit(number);
 
   // print the bits of the number
   PrintIntegerAsBitField(modified_number);
@@ -421,7 +456,6 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_MultiplicationByBitwiseOperati
 void ElementsOfProgrammingChapter04PrimitiveTypes_SubstractionByBitwiseOperations() {
 
   // get two small random numbers (they must be < 2^16, since the result can maximally be 2^32-1)
-  srand(time(NULL));
   uint16_t number1 = rand() % std::numeric_limits<uint16_t>::max();
   uint16_t number2 = rand() % std::numeric_limits<uint16_t>::max();
   if (number2 > number1) {
@@ -448,7 +482,6 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_SubstractionByBitwiseOperation
 void ElementsOfProgrammingChapter04PrimitiveTypes_DivisionByBitwiseOperations() {
 
   // get two small random numbers (they must be < 2^16, since the result can maximally be 2^32-1)
-  srand(time(NULL));
   uint16_t number1 = rand() % std::numeric_limits<uint16_t>::max();
   uint16_t number2 = rand() % std::numeric_limits<uint16_t>::max();
   if (number2 > number1) {
@@ -464,6 +497,103 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_DivisionByBitwiseOperations() 
   // output the result
   std::cout << "Bitwise implementation yields: " << quotient << std::endl;
   std::cout << "Built-in multiplication yields: " << number1 / number2 << std::endl;
+
+  return;
+}
+
+
+/*
+  Exercise description: compute x^k, with x double, k integer
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeIntegerPower() {
+
+  // get two random numbers (let the integer be power be < 32, and the double be 1 < x <= 2,
+  // so that the result will never be greater than 2^32. double still provides a precision
+  // of 10^-7 when the number is of order 2^32~10^9, see https://en.wikipedia.org/wiki/IEEE_754)
+  uint16_t number1 = rand() % std::numeric_limits<uint16_t>::max();
+  uint16_t k = 14; // rand() % 32;
+  double x = 1.214; // 1.0 + 1.0 / number1;
+  std::cout << "Compute power:" << x << " ^ " << k << std::endl;
+
+  // compute the difference
+  double xpowerk = PowerSelfimplemented(x, k);
+
+  // output the result
+  std::cout << "Self implementation yields: " << xpowerk << std::endl;
+  std::cout << "Library power function yields: " << pow(x, k) << std::endl;
+
+  return;
+}
+
+
+/*
+  Exercise description: given an integer, give back the integer with reverse digits
+
+  e.g.   145 -> 541
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_ReverseDecimalDigits(uint32_t number) {
+
+  // ACHTUNG: reversing could lead to overflow 4 000 000 009  -> 9 000 000 004  > 4 G ! 
+  if (number > pow(10, 9)) {
+    number /= 10;
+  }
+
+  // Print the input
+  std::cout << "Reversing decimal digits of the integer:" << std::endl;
+  std::cout << number << std::endl;
+
+  // compute   
+  uint32_t reversedecimaldigits = ReverseDecimalDigits(number);
+
+  // print the bits of the number
+  std::cout << reversedecimaldigits << std::endl;
+
+  return;
+}
+
+
+/*
+  Exercise description: given an integer, check if it is a palindrome or not
+
+  e.g.   141 -> true, 142 -> false
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_DecimalPalindrome(uint32_t number) {
+
+  // Print the input
+  std::cout << "Is the following number a palindrome:" << number << std::endl;
+
+  // compute   
+  bool ispalindrome = IsDecimalPalindrome(number);
+
+  // print the bits of the number
+  std::cout << (ispalindrome ? " Yes!" : "No!") << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description: suppose you have a coin, but need a uniform random number
+  generator on 0...n. 
+  
+*/
+void ElementsOfProgrammingChapter04PrimitiveTypes_UniformRandomNumberFromCoin() {
+
+  const int n = 10;
+  std::vector<int> number_occurrences(n, 0);
+  const int test_sample = 10000;
+  for (int i = 0; i < test_sample; ++i) {
+    int result_rand_generator = UniformRandomNumberFromCoin(n);
+    number_occurrences.at(result_rand_generator) += 1;
+  }
+
+  // Uniform rand number creator gave
+  double sum_ratios = 0;
+  for (int k = 0; k < n; ++k) {
+    double ratio = (double)number_occurrences.at(k) / test_sample;
+    sum_ratios += ratio;
+    std::cout << "k = " << k << ": " << ratio << std::endl;
+  }
+  std::cout << "sum_ratios: " << sum_ratios << std::endl;
 
   return;
 }
@@ -652,6 +782,69 @@ int PositionOfLowestUnsetBit(uint32_t number) {
     }
     return pos;
   }
+}
+
+/*
+  idea:  we shift the bits right until the number is 0 and make an OR
+
+   -> that would O(n). We can actually improve to O(log(n)) by using
+   that in each round we can double the number of set bits
+
+   0000 0000
+   1100 0000
+   1111 0000
+   1111 1111
+
+   -> 4 iterations needed instead of 8
+*/
+uint32_t RightPropagateHighestSetBit(uint32_t number) { // O(log(n))
+  
+  int counter = 1;
+  while ((number >> counter) != 0x0u) {
+    uint32_t debug_var = number >> counter;
+    number |= (number >> counter);
+    counter *= 2;
+    // bitshift only defined until n-1, if n is number of bits
+    if (counter >= sizeof(number) * 8) {
+      break;
+    }
+  }
+  return number;
+}
+
+/* 
+  idea: 
+  
+  i think we can not do better than O(n) here
+  with n the position of the highest set bit..
+
+*/
+int PositionOfHighestSetBit(uint32_t number) {
+  if (number == 0x0u) { // case that no bit is on
+    return ~number;
+  }
+  int pos = 0;
+  while (number) {
+    number >>= 1;
+    ++pos;
+  }
+  return pos;
+}
+
+/*
+  idea:
+  
+  we can isolate the highest set bit easily, if all bits after the highest-set-bit
+  are 1's, e.g.
+
+    0011 1111  + 0000 0001 = 0100 0000  --> right shift by 1 gives the bit
+
+    -> so the only task that remains is to rightpropagate all 1's after the highest
+
+*/
+uint32_t FindHighestSetBit(uint32_t number) {
+  number = RightPropagateHighestSetBit(number);  // O(log(n))
+  return ((number + 0x1u) >> 1);
 }
 
 /*
@@ -1043,6 +1236,147 @@ uint32_t BitwiseDivision(uint32_t num1, uint32_t num2) {
     quotient |= powerof2_that_num2_fits_in_num1;
   }
   return quotient;
+}
+
+
+/*
+  idea: the brute force would be to do k multiplications
+
+  one can improve the brute force by reusing the results:
+
+  x^2  = x*x  
+  x^4  = x^2*x^2
+  x^8  = x^4*x^4 
+  x^16 = x^8*x^8    
+  x^32 = x^16*x^16 ->  to get here needed: 5 multiplications instead of 32
+  
+  then the question comes up: how to handle cases where k is between powers of 2 ?
+
+  to avoid additional logic, we can go the other way around, and simply start
+  at k, then half k and use
+
+  x^k = x^(k/2 + k/2) = x^k/2 * x^k/2
+
+  continue this way recursively until we reach x^1, which will need log(k) recursions
+  (and log(k) is maximally the number of bits for k, since k<2^msb in our case 32).
+
+  the only caveat remaining is what to do if k is not even. in that case
+  (k-1) is even so:
+
+  x^k = x^((k-1)+1) = x * x^((k-1)/2) * x^((k-1)/2)
+
+  Note: the k < 0 case should be caught by the caller (sending in 1/x instead)
+
+ */
+double PowerSelfimplemented(double x, uint32_t k) {
+  if (k == 1 || k == 0) {
+    return x;
+  }
+  else {    
+    if (k % 2 == 0) {
+      double xpowerkhalf = PowerSelfimplemented(x, k / 2);
+      return xpowerkhalf * xpowerkhalf;
+    }
+    else {
+      double xpowerkminus1half = PowerSelfimplemented(x, (k - 1) / 2);
+      return x * xpowerkminus1half * xpowerkminus1half;
+    }    
+  }
+}
+
+/*
+  idea: obtain digits by % 10, and make a decimal-left-shift of
+        already obtained numbers using  *10
+*/
+uint32_t ReverseDecimalDigits(uint32_t number) { // O(k), where k number decimal digits
+
+  uint32_t reverse = 0x0u;
+
+  while (number) {
+    uint32_t next_decimal_digit = number % 10;
+    reverse = reverse * 10 + next_decimal_digit; // *10 is a leftshift in decimal basis
+    number /= 10;
+  }
+
+  return reverse;
+}
+
+/*
+  ideas: 
+  1. one could Reverse the deciaml number and compare 
+  2. one could go through, extracting most- and least-significant digit and compare
+
+  -> both are O(n), but 2nd approach should actually need only n/2 iterations
+    
+*/
+bool IsDecimalPalindrome(int number) {
+  
+  if (number < 0) {
+    return false;
+  }
+  else {
+    while (number) {      
+      // log_10(x) gibt den Index der hoechsten Ziffer plus einen Rest,
+      // der die weiteren Ziffern repraesentiert
+      // e.g. log10(1234) = 3.09.. --> wir sind hier an der 3 interessiert
+      int index_msdigit = (int)floor(log10(number));
+      int msdigit = number / (int)pow(10, index_msdigit);
+      int lsdigit = number % 10;
+      if (msdigit == lsdigit) {
+        number -= (msdigit * (int)pow(10, index_msdigit)); // remove msd
+        number /= 10; // remove lsd
+      }
+      else {
+        return false;
+      }
+    }
+    return true;
+  }  
+}
+
+/*
+  idea: if we have a coin, we have a random number creator on {0, 1}.
+
+  -> by repeatedly throwing the coin n-times we can create random bit-sequences 
+  of length n, e.g. with three throws the following 2^3 sequences are each
+  equally likely to be thrown
+
+  000
+  001
+  010
+  011
+  100
+  101
+  110
+  111
+
+  -> given a coin it is trivial to create random numbers on 2^k, k integer.
+
+  The only caveat is what to do, if we need random numbers on 0..n, 
+  where n is not a power of two ?
+
+  In that case we make one additional throw and repeat the experiment whenever
+  the result sequence is one, which is not in 0..n.
+
+*/
+int UniformRandomNumberFromCoin(int max_rand) {
+
+  uint32_t coin_sequence = 0x0u;
+
+  int throws = 0;
+  // after the nth throw, we have a sequence of n-bits, that can be in {0,..,2^(n-1)}
+  while ((int)pow(2, throws) < max_rand) { // throw coins until 2^throws >= max_rand
+    const int coin = rand() % 2;
+    coin_sequence <<= 1;
+    coin_sequence |= (uint32_t)coin;
+    ++throws;
+  }
+  // in case we got one of the numbers between max_rand and 2^throws, repeat
+  if (coin_sequence >= (uint32_t)max_rand) {
+    coin_sequence = UniformRandomNumberFromCoin(max_rand);
+  }
+
+  return coin_sequence;
 }
 
 //----------- Parity computations
