@@ -1,6 +1,41 @@
 #pragma once
 
+#include <iostream>
 #include <stdint.h>
+
+
+typedef struct Rectangle {
+  int x1, x2;
+  int y1, y2;
+
+  Rectangle() {
+    x1 = 0;
+    x2 = 1;
+    y1 = 0;
+    y2 = 1;
+  }
+
+  Rectangle(int xi, int xf, int yi, int yf) {
+    bool bad_input = false;
+    if (x1 > x2) {
+      std::cout << "Bad input. Expected x1 <= x2 for rectangle" << std::endl;
+      bad_input = true;
+    }
+    else if (y1 > y2) {
+      std::cout << "Bad input. Expected y1 <= y2 for rectangle" << std::endl;
+      bad_input = true;
+    }
+    if (!bad_input) {
+      x1 = xi;
+      x2 = xf;
+      y1 = yi;
+      y2 = yf;
+    }
+    else {
+      Rectangle();
+    }
+  }
+} RectangleType;
 
 void ElementsOfProgrammingChapter04PrimitiveTypes();
 
@@ -32,6 +67,8 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_ReverseDecimalDigits(uint32_t 
 void ElementsOfProgrammingChapter04PrimitiveTypes_DecimalPalindrome(uint32_t number);
 
 void ElementsOfProgrammingChapter04PrimitiveTypes_UniformRandomNumberFromCoin();
+
+void ElementsOfProgrammingChapter04PrimitiveTypes_IntersectionOfRectangles();
 
 void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityPerDefinition(uint32_t number);
 void ElementsOfProgrammingChapter04PrimitiveTypes_ComputeParityUsingLowestSetBit(uint32_t number);
@@ -76,9 +113,12 @@ bool IsDecimalPalindrome(int number);
 
 int UniformRandomNumberFromCoin(int max_rand);
 
+RectangleType ComputeIntersectionOfRectangles(RectangleType rect1, RectangleType rect2);
+
 bool ComputeParityPerDefinition(uint32_t num);
 bool ComputeParityUsingUnsetLowestSetBit(uint32_t  num);
 bool ComputeParityUsingLookUpTable(uint32_t  num);
 bool ComputeParityUsingDivideAndConquer(uint32_t num, int n_bits_considered);
 
 void PrintIntegerAsBitField(uint32_t  num);
+void PrintRectangle(const RectangleType& rect);

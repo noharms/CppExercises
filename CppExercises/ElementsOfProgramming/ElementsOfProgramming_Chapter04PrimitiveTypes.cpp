@@ -11,6 +11,7 @@
 #include <random>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 void ElementsOfProgrammingChapter04PrimitiveTypes() {
   
@@ -135,6 +136,12 @@ void ElementsOfProgrammingChapter04PrimitiveTypes() {
   std::cout << "-- Exercise: Create uniform random number generator from coin " << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter04PrimitiveTypes_UniformRandomNumberFromCoin();
+  
+  //--------- Exercise: Intersection of rectangles
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Intersection of rectangles " << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter04PrimitiveTypes_IntersectionOfRectangles();
 
   ////--------- exercise: compute parity - using unsetlowestsetbit
   //std::cout << "------------------------------" << std::endl;
@@ -594,6 +601,36 @@ void ElementsOfProgrammingChapter04PrimitiveTypes_UniformRandomNumberFromCoin() 
     std::cout << "k = " << k << ": " << ratio << std::endl;
   }
   std::cout << "sum_ratios: " << sum_ratios << std::endl;
+
+  return;
+}
+
+void ElementsOfProgrammingChapter04PrimitiveTypes_IntersectionOfRectangles() {
+
+  // creat two random rectangles
+  const int rand_max = 20;
+  const int x1 = rand() % rand_max;
+  const int x2 = x1 + rand() % (rand_max - x1);
+  const int y1 = rand() % rand_max;
+  const int y2 = y1 + rand() % (rand_max - y1);
+  RectangleType rect1(x1, x2, y1, y2);
+  const int u1 = rand() % rand_max;
+  const int u2 = u1 + rand() % (rand_max - u1);
+  const int v1 = rand() % rand_max;
+  const int v2 = v1 + rand() % (rand_max - v1);
+  RectangleType rect2(u1, u2, v1, v2);
+  
+  std::cout << "Rectangle 1: " << std::endl;
+  PrintRectangle(rect1);
+  std::cout << "Rectangle 2: " << std::endl;
+  PrintRectangle(rect2);
+
+  // compute intersection
+  RectangleType intersection = ComputeIntersectionOfRectangles(rect1, rect2);
+
+  // intersection
+  std::cout << "Rectangle intersection: " << std::endl;
+  PrintRectangle(intersection);
 
   return;
 }
@@ -1379,6 +1416,55 @@ int UniformRandomNumberFromCoin(int max_rand) {
   return coin_sequence;
 }
 
+/*
+  Idea: 
+
+  the intersection of two rectangles can easily be computed in O(1).
+
+  Fix rect1 and check if: 
+
+    x1 <= rect2.x1 <= x2   ||   x1 <= rect2.x2 <= x2
+
+    if no, the intersection is empty, if yes, further check y-coordinates
+
+    y1 <= rect2.y1 <= y2   ||   y1 <= rect2.y2 <= y2
+
+    if no, the intersection is empty, if yes, we can compute the intersection.
+
+      intersection.x1 is the larger one of (rect1.x1, rect2.x1)
+      intersection.x2 is the smaller one of (rect1.x2, rect2.x2)
+
+    and analogously for the y-values.
+
+
+*/
+RectangleType ComputeIntersectionOfRectangles(RectangleType rect1, RectangleType rect2) {
+
+  bool intersection_exists = false;
+
+  if ((rect1.x1 <= rect2.x1 && rect2.x1 <= rect1.x2) || (rect1.x1 <= rect2.x2 && rect2.x2 <= rect1.x2)) {
+    if ((rect1.y1 <= rect2.y1 && rect2.y1 <= rect1.y2) || (rect1.y1 <= rect2.y2 && rect2.y2 <= rect1.y2)) {
+      intersection_exists = true;
+    }
+  }
+
+  RectangleType intersection;
+  if (intersection_exists) {
+    intersection.x1 = std::max(rect1.x1, rect2.x1);
+    intersection.x2 = std::min(rect1.x2, rect2.x2);
+    intersection.y1 = std::max(rect1.y1, rect2.y1);
+    intersection.y2 = std::min(rect1.y2, rect2.y2);
+  }
+  else {
+    intersection.x1 = -1;
+    intersection.x2 = -1;
+    intersection.y1 = -1;
+    intersection.y2 = -1;
+  }
+  
+  return intersection;
+}
+
 //----------- Parity computations
 /*
     The definition of the parity is the XOR of all single bits !
@@ -1509,5 +1595,14 @@ void PrintIntegerAsBitField(uint32_t  num) {
     bit_stack.pop();
   }
   std::cout << std::endl;
+  return;
+}
+
+/*
+  Print a rectangle
+*/
+void PrintRectangle(const RectangleType& rect) {
+  std::cout << "x1 = " << rect.x1 << ", x2 = " << rect.x2 << std::endl;
+  std::cout << "y1 = " << rect.y1 << ", y2 = " << rect.y2 << std::endl;
   return;
 }
