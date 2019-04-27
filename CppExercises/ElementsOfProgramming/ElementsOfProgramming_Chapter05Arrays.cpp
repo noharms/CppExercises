@@ -42,6 +42,14 @@ void ElementsOfProgrammingChapter05Arrays() {
   ElementsOfProgrammingChapter05Arrays_MergeSort(&rand_vec);
   PrintVector(&rand_vec);
   rand_vec = rand_vec_backup;
+  
+  //--------- Exercise: Quick-Sort
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Quick-Sort" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_QuickSort(&rand_vec);
+  PrintVector(&rand_vec);
+  rand_vec = rand_vec_backup;
 
 
 
@@ -64,9 +72,7 @@ void ElementsOfProgrammingChapter05Arrays() {
   Exercsie description: Use BubbleSort algorithm to sort an array.
 */
 void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr) {
-
   BubbleSort(vec_ptr);
-
   return;
 }
 
@@ -74,13 +80,17 @@ void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr) 
   Exercise description: Use MergeSort algorithm to sort an array.
 */
 void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr) {
-
   *vec_ptr = MergeSort(*vec_ptr);
-
   return;
 }
 
-
+/*
+  Exercise description: Use QuickSort algorithm to sort an array.
+*/
+void ElementsOfProgrammingChapter05Arrays_QuickSort(std::vector<int>* vec_ptr) {
+  QuickSort(vec_ptr);
+  return;
+}
 
 /**
  *----------------------------------------------------------------------------------------------
@@ -181,6 +191,89 @@ std::vector<int> MergeSort(const std::vector<int>& vec) {
   }
 }
 
+/*
+  QuickSorts idea is to divide the array to conquer it:
+
+  Step1: pick a pivot
+  Step2: put the pivot to correct position
+  Step3: put smaller elements left, larger elements right
+  Step4: QuickSort the left half and the right half
+
+  The idea is to pick a pivot element, which is put its
+  final position in the sorted array. Then the array is 
+  divided into two parts where one contains the elements
+  smaller than the pivot and the other one the elements
+  larger than the pivot. Therefore, it would be optimal
+  for the pivot to have half of the other elements be
+  smaller than it and the other half be larger than it.
+  
+  Assuming the pivot is always close to optimal, we will
+  need to reach a recursion level of approximately O(log(n))
+  to have an array with only two elements, which is
+  already sorted once the pivot is put to its correct
+  position (i.e. 0 or 1).
+  
+*/
+void QuickSort(std::vector<int>* vec_ptr) {
+
+  std::vector<int>& vec = *vec_ptr;
+
+  if (vec.size() <= 1) {
+    return;
+  }
+  
+  // choose first element as pivot
+  int pivot_idx = 0;
+  const int pivot = vec.at(pivot_idx);
+
+  // put pivot to correct position
+  int counter_smaller_elems = 0;
+  for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it) {
+    if (it - vec.begin() == pivot_idx) {
+      continue; // don't count the pivot itself
+    }
+    if (*it < pivot) {
+      ++counter_smaller_elems;
+    }
+  }
+  vec.at(pivot_idx) = vec.at(counter_smaller_elems);
+  pivot_idx = counter_smaller_elems;
+  vec.at(pivot_idx) = pivot;
+  
+  // put smaller elemns left, larger/equal right
+  int i = 0, j = vec.size() - 1;
+  while(true) {
+    while (vec.at(i) < pivot) {
+      ++i;
+    }
+    while (vec.at(j) >= pivot && j > pivot_idx) {
+      --j;
+    }
+    if (i >= pivot_idx || j == pivot_idx) {
+      break;
+    }
+    else {
+      int temp = vec.at(i);
+      vec.at(i) = vec.at(j);
+      vec.at(j) = temp;
+      ++i;
+      --j;
+    }
+  }
+
+  // make a quicksort on the subarrays
+  std::vector<int> left(vec.begin(), vec.begin() + pivot_idx);
+  std::vector<int> rght(vec.begin() + pivot_idx + 1, vec.end());
+  QuickSort(&left);
+  QuickSort(&rght);
+
+  // put the sorted left and rght back
+  std::copy(left.begin(), left.end(), vec.begin());
+  std::copy(rght.begin(), rght.end(), vec.begin() + pivot_idx + 1);
+
+
+  return;
+}
 
 
 
