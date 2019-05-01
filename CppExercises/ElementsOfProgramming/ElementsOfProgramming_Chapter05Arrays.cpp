@@ -80,7 +80,8 @@ void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr) 
   Exercise description: Use MergeSort algorithm to sort an array.
 */
 void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr) {
-  *vec_ptr = MergeSort(*vec_ptr);
+  //*vec_ptr = MergeSort_FirstTry(*vec_ptr);
+  MergeSort(vec_ptr, 0, (*vec_ptr).size() - 1);
   return;
 }
 
@@ -88,7 +89,8 @@ void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr) {
   Exercise description: Use QuickSort algorithm to sort an array.
 */
 void ElementsOfProgrammingChapter05Arrays_QuickSort(std::vector<int>* vec_ptr) {
-  QuickSort(vec_ptr);
+  //QuickSort_FirstTry(vec_ptr);
+  QuickSort(vec_ptr, 0, (*vec_ptr).size() - 1);
   return;
 }
 
@@ -151,7 +153,7 @@ void BubbleSort(std::vector<int>* vec_ptr) {
   O(n) + 2*O(n/2) space... the 2*O(n/2) should be enough
 
 */
-std::vector<int> MergeSort(const std::vector<int>& vec) {
+std::vector<int> MergeSort_FirstTry(const std::vector<int>& vec) {
   
   const int vec_len = vec.size();
   if (vec_len == 1) {
@@ -162,8 +164,8 @@ std::vector<int> MergeSort(const std::vector<int>& vec) {
     const size_t len_rght_subvec = vec_len - len_left_subvec;
     std::vector<int> left_subvec(vec.begin(), vec.begin() + len_left_subvec);
     std::vector<int> rght_subvec(vec.begin() + len_left_subvec, vec.end());
-    left_subvec = MergeSort(left_subvec);
-    rght_subvec = MergeSort(rght_subvec);
+    left_subvec = MergeSort_FirstTry(left_subvec);
+    rght_subvec = MergeSort_FirstTry(rght_subvec);
 
     std::vector<int> sorted_vec;
     size_t ll = 0;
@@ -192,6 +194,65 @@ std::vector<int> MergeSort(const std::vector<int>& vec) {
 }
 
 /*
+  Mergesort:
+
+  1. Find middle index
+  2. MergeSort(left)
+  3. MergeSort(right)
+  4. Merge left and right
+
+*/
+void MergeSort(std::vector<int>* vec_ptr, const int i_start, const int i_end) {
+  const int n_elems = i_end - i_start + 1;
+  if (n_elems <= 1) {
+    return;
+  }
+  const int n_elems_left = n_elems / 2;
+  MergeSort(vec_ptr, i_start, i_start + n_elems_left - 1);
+  MergeSort(vec_ptr, i_start + n_elems_left, i_end);
+  MergeTwoSortedHalves(vec_ptr, i_start, i_end, n_elems_left);
+  return;
+}
+
+/*
+  Idea is:
+
+  i think it is not possible to merge the two sorted halves to
+  a sorted whole using only O(n) time and 0 space.
+
+  -> let us grant O(n) space to merge in O(n) time
+*/
+void MergeTwoSortedHalves(std::vector<int>* vec_ptr, const int i_start,
+  const int i_end, const int n_elems_left) {
+  // n_elems should be at least 2, so that n_elems left/rght both at least 1
+  std::vector<int>& vec = *vec_ptr;
+  int i = i_start;
+  int j = i_start + n_elems_left;
+  std::vector<int> vec_backup(vec);
+  int k = i_start;
+  while(i < i_start + n_elems_left && j <= i_end) {
+    const int next_left = vec_backup.at(i);
+    const int next_rght = vec_backup.at(j);
+    if (next_left <= next_rght) {
+      vec.at(k++) = next_left;
+      ++i;
+    }
+    else {
+      vec.at(k++) = next_rght;
+      ++j;
+    }
+  }
+  while (i < i_start + n_elems_left) {
+    vec.at(k++) = vec_backup.at(i++);
+  }
+  while (j < i_end) {
+    vec.at(k++) = vec_backup.at(j++);
+  }
+  return;
+}
+
+
+/*
   QuickSorts idea is to divide the array to conquer it:
 
   Step1: pick a pivot
@@ -214,7 +275,7 @@ std::vector<int> MergeSort(const std::vector<int>& vec) {
   position (i.e. 0 or 1).
   
 */
-void QuickSort(std::vector<int>* vec_ptr) {
+void QuickSort_FirstTry(std::vector<int>* vec_ptr) {
 
   std::vector<int>& vec = *vec_ptr;
 
@@ -264,8 +325,8 @@ void QuickSort(std::vector<int>* vec_ptr) {
   // make a quicksort on the subarrays
   std::vector<int> left(vec.begin(), vec.begin() + pivot_idx);
   std::vector<int> rght(vec.begin() + pivot_idx + 1, vec.end());
-  QuickSort(&left);
-  QuickSort(&rght);
+  QuickSort_FirstTry(&left);
+  QuickSort_FirstTry(&rght);
 
   // put the sorted left and rght back
   std::copy(left.begin(), left.end(), vec.begin());
@@ -276,7 +337,80 @@ void QuickSort(std::vector<int>* vec_ptr) {
 }
 
 
+/*
+  QuickSort:
 
+*/
+void QuickSort(std::vector<int>* vec_ptr, int i_start, int i_end) {
+  // if rr == ll there is only one value, so no sortin necessary
+  if (i_end <= i_start) {
+    return;
+  }
+  int pivot_idx = FindPivotAndPartition(vec_ptr, i_start, i_end);
+  QuickSort(vec_ptr, i_start, pivot_idx - 1);
+  QuickSort(vec_ptr, pivot_idx + 1, i_end);
+  return;
+}
+
+/*
+  We partition around the pivot like  [ < pivot, pivot , >= pivot ].
+
+  The pivot is chosen (at random) to be the first element.
+
+  Algorithm: 
+    
+  go from left until you find an element that is out of order (i.e. >= pivot)
+  go from rght until you find an element that is out of order (i.e. < pivot)
+  swap both out of order elements, continue
+  repeat until left_ptr and rght_ptr meet (that is the pivot), or switch
+  sides (then the last step was a swap; pivot is then the element right of rght_ptr)
+  
+*/
+int FindPivotAndPartition(std::vector<int>* vec_ptr, int i_start, int i_end) {
+
+  if (i_end == i_start) {
+    return i_start;
+  }
+  else if (i_end < i_start) {
+    // error case.. should never reach here
+  }
+
+  std::vector<int>& vec = *vec_ptr;
+
+  const int pivot = vec.at(i_start);
+
+  int move_direction = 0;  // 1: move i_start to the right, 0: move i_end to the left
+  
+  while (true) {
+    if (move_direction == 0) {
+      while (vec.at(i_end) >= pivot && i_end > i_start) {
+        --i_end;
+      }
+    }
+    else {
+      while (vec.at(i_start) < pivot) {
+        ++i_start;
+      }
+    }    
+    if (i_start >= i_end) {
+      break;
+    }
+    else {
+      SwapInt(&(vec.at(i_start)), &(vec.at(i_end)));
+      move_direction = move_direction ? 0 : 1;
+    }    
+  }
+
+  return i_start;
+}
+
+
+void SwapInt(int* a, int* b) {
+  const int temp = *a;
+  *a = *b;
+  *b = temp;
+  return;
+}
 
 void PrintVector(const std::vector<int>* vec_ptr) {
   //const std::vector<int> vec = *vec_ptr;
