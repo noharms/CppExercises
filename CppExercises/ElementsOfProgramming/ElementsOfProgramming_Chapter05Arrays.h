@@ -7,7 +7,10 @@ void ElementsOfProgrammingChapter05Arrays();
 void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr);
 void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr);
 void ElementsOfProgrammingChapter05Arrays_QuickSort(std::vector<int>* vec_ptr);
+
 void ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber();
+void ElementsOfProgrammingChapter05Arrays_AdditionDigitArrays();
+void ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays();
 
 
 void BubbleSort(std::vector<int>* vec_ptr);
@@ -23,6 +26,15 @@ int FindPivotAndPartition(std::vector<int>* vec_ptr, int ll, int rr);
 
 void IncrementArrayNumber(std::vector<int>* vec_ptr, const int base);
 
+std::vector<int> AddDigitArrays(std::vector<int>* vec_ptr_1,
+  std::vector<int>* vec_ptr_2, const int base);
+
+std::vector<int> MultiplyDigitArrays(std::vector<int>* vec_ptr_1,
+  std::vector<int>* vec_ptr_2, const int base);
+std::vector<int> MultiplyDigitArrayTimesDigit(std::vector<int>* vec_ptr_1,
+  const int digit, const int base);
+
 
 void SwapInt(int* a, int* b);
 void PrintVector(const std::vector<int>* vec_ptr);
+void PrintVectorOfDigitsMSDat0(const std::vector<int>* vec_ptr);

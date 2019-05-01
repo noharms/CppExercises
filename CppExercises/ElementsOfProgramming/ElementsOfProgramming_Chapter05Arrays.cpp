@@ -60,8 +60,19 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "-- Exercise: Increment Digit Array" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber();
+  
+  //--------- Exercise: Addition of two digit arrays
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: addition of two digit arrays" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_AdditionDigitArrays();
 
-
+  //--------- Exercise: Multiplication of two digit arrays
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Multiplication of two digit arrays" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays();
+  
 
   return;
 
@@ -118,7 +129,7 @@ void ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber() {
     digits.emplace_back(base - 1);
   }
 
-  // print: note msd first
+  // print: msd must appear first
   std::cout << "We want to increment the number:" << std::endl;
   for (int i = digits.size() - 1; i >= 0; --i) {
     std::cout << digits.at(i);
@@ -134,6 +145,82 @@ void ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber() {
     std::cout << digits.at(i);
   }
   std::cout << std::endl;
+
+  return;
+}
+
+
+/*
+  Exercise description: 
+  
+  given two arrays of digits that represent
+  numbers (MSD at beginning), add up the numbers
+*/
+void ElementsOfProgrammingChapter05Arrays_AdditionDigitArrays() {
+  
+  // create array of digits
+  std::vector<int> digits_1;
+  std::vector<int> digits_2;
+  const int n_digits_max = 20;
+  const int n_digits_1 = 3;
+  const int n_digits_2 = 3;
+  const int base = 10;
+  for (int i = 0; i < n_digits_1; ++i) {    
+    digits_1.emplace_back(rand() % base);    
+  }
+  for (int i = 0; i < n_digits_2; ++i) {
+    digits_2.emplace_back(rand() % base);
+  }
+
+  // print: msd must appear first
+  std::cout << "We want to add the numbers:" << std::endl;
+  PrintVectorOfDigitsMSDat0(&digits_1);
+  PrintVectorOfDigitsMSDat0(&digits_2);
+
+  // addition
+  std::vector<int> sum = AddDigitArrays(&digits_1, &digits_2, base);
+
+  // print: result
+  std::cout << "Result:" << std::endl;
+  PrintVectorOfDigitsMSDat0(&sum);
+
+  return;
+}
+
+
+/*
+  Exercise description:
+
+  given two arrays of digits that represent
+  numbers (MSD at beginning), multiply the numbers
+*/
+void ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays() {
+
+  // create array of digits
+  std::vector<int> digits_1;
+  std::vector<int> digits_2;
+  const int n_digits_max = 20;
+  const int n_digits_1 = 20;
+  const int n_digits_2 = 20;
+  const int base = 10;
+  for (int i = 0; i < n_digits_1; ++i) {
+    digits_1.emplace_back(rand() % base);
+  }
+  for (int i = 0; i < n_digits_2; ++i) {
+    digits_2.emplace_back(rand() % base);
+  }
+
+  // print: msd must appear first
+  std::cout << "We want to multiply the numbers:" << std::endl;
+  PrintVectorOfDigitsMSDat0(&digits_1);
+  PrintVectorOfDigitsMSDat0(&digits_2);
+
+  // addition
+  std::vector<int> product = MultiplyDigitArrays(&digits_1, &digits_2, base);
+
+  // print: result
+  std::cout << "Result:" << std::endl;
+  PrintVectorOfDigitsMSDat0(&product);
 
   return;
 }
@@ -455,7 +542,7 @@ int FindPivotAndPartition(std::vector<int>* vec_ptr, int i_start, int i_end) {
 */
 void IncrementArrayNumber(std::vector<int>* vec_ptr, const int base) {
   std::vector<int>& vec = *vec_ptr;
-  int i = 0;
+  size_t i = 0;
   int carryover = 0;
   do {
     int digit_sum = vec.at(i) + 1;
@@ -467,6 +554,97 @@ void IncrementArrayNumber(std::vector<int>* vec_ptr, const int base) {
     vec.emplace_back(1);
   }
   return;
+}
+
+/*
+  Addition of digit arrays:
+
+  just go through all digits and add up the digits, carrying
+  over excess-digits.
+
+*/
+std::vector<int> AddDigitArrays(std::vector<int>* vec_ptr_1,
+  std::vector<int>* vec_ptr_2, const int base) {
+
+  std::vector<int>& vec_big = (*vec_ptr_1).size() > (*vec_ptr_2).size() ? *vec_ptr_1 : *vec_ptr_2;
+  std::vector<int>& vec_small = (*vec_ptr_1).size() > (*vec_ptr_2).size() ? *vec_ptr_2 : *vec_ptr_1;
+  std::vector<int> sum;
+
+  int next_small = vec_small.size() - 1;
+  int next_big = vec_big.size() - 1;
+  int carryover = 0;  
+
+  while (next_big >= 0) {
+    int digit_sum = vec_big.at(next_big--) + carryover;
+    if (next_small >= 0) {
+      digit_sum += vec_small.at(next_small--);
+    }      
+    int digit = digit_sum % base;    
+    sum.insert(sum.begin(), digit);
+    carryover = digit_sum / base;
+  }  
+  if (carryover) {    
+    sum.insert(sum.begin(), carryover);
+  }
+  return sum;
+}
+
+
+/*
+  Multiplication of digit arrays:
+
+  we can break down the multiplication into multiplications with a digit,
+  shifts, and additions
+  
+
+  abcde * fgh = abcde * (f*10^2 + g*10^1 + h*10^1)
+              =  (abcde * f) * 10^2
+               + (abcde * g) * 10^1
+               + (abcde * h) * 10^0
+
+*/
+std::vector<int> MultiplyDigitArrays(std::vector<int>* vec_ptr_1,
+  std::vector<int>* vec_ptr_2, const int base) {
+  
+  std::vector<int>& vec_big = (*vec_ptr_1).size() > (*vec_ptr_2).size() ? *vec_ptr_1 : *vec_ptr_2;
+  std::vector<int>& vec_small = (*vec_ptr_1).size() > (*vec_ptr_2).size() ? *vec_ptr_2 : *vec_ptr_1;
+  std::vector<int> product;
+
+  for (int i = vec_small.size() - 1; i >= 0; --i) {
+    const int ith_digit_in_small = vec_small.at(i);
+    std::vector<int> big_x_digit = MultiplyDigitArrayTimesDigit(&vec_big, ith_digit_in_small, base);
+    // since the msd is the first, we can easily shift the number left by appending 0's
+    const unsigned int power_of_digit = (vec_small.size() - 1 - i);
+    big_x_digit.insert(big_x_digit.end(), power_of_digit, 0);    
+    product = AddDigitArrays(&product, &big_x_digit, base);
+  }
+
+  return product;
+}
+
+
+std::vector<int> MultiplyDigitArrayTimesDigit(std::vector<int>* vec_ptr_1,
+  const int digit, const int base) {
+  if (digit >= base) {
+    // error case.. 
+    std::cout << "ERROR.. should not reach here" << std::endl;
+  }
+
+  std::vector<int>& vec = *vec_ptr_1;
+  std::vector<int> product;
+  int carryover = 0;
+
+  for (int i = vec.size() - 1; i >= 0; --i) {
+    const int temp_product = vec.at(i) * digit + carryover;
+    const int new_digit = temp_product % base;
+    product.insert(product.begin(), new_digit);
+    carryover = temp_product / base;
+  }
+  if (carryover) {
+    product.insert(product.begin(), carryover);
+  }
+
+  return product;
 }
 
 
@@ -488,5 +666,18 @@ void PrintVector(const std::vector<int>* vec_ptr) {
   });
   std::cout << std::endl;
   return;
+}
+
+void PrintVectorOfDigitsMSDat0(const std::vector<int>* vec_ptr) {
+  const std::vector<int>& vec = *vec_ptr;
+  for (size_t i = 0; i < vec.size(); ++i) {
+    if (vec.at(i) >= 10) {
+      std::cout << "(>10)" << std::endl;
+    }
+    else {
+      std::cout << vec.at(i);
+    }
+  }
+  std::cout << std::endl;
 }
 
