@@ -26,6 +26,8 @@ void ElementsOfProgrammingChapter05Arrays() {
   // print vector
   PrintVector(&rand_vec);
 
+  //----------------------------------- SORTING EXERCISES
+
   //--------- Exercise: Bubble-Sort
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: Bubble Sort" << std::endl;
@@ -51,6 +53,13 @@ void ElementsOfProgrammingChapter05Arrays() {
   PrintVector(&rand_vec);
   rand_vec = rand_vec_backup;
 
+  //---------------------------------- OTHER ARRAY EXERCISES
+
+  //--------- Exercise: Increment digit array
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Increment Digit Array" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber();
 
 
 
@@ -91,6 +100,41 @@ void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr) {
 void ElementsOfProgrammingChapter05Arrays_QuickSort(std::vector<int>* vec_ptr) {
   //QuickSort_FirstTry(vec_ptr);
   QuickSort(vec_ptr, 0, (*vec_ptr).size() - 1);
+  return;
+}
+
+/*
+  Exercise description: given an array of digits that represents
+  a number (LSD at beginning), increment the number
+*/
+void ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber() {
+  
+  // create array of digits
+  std::vector<int> digits;
+  const int n_digits = 20;
+  const int base = 2;
+  for (int i = 0; i < n_digits; ++i) {
+    //digits.emplace_back(rand() % base);  
+    digits.emplace_back(base - 1);
+  }
+
+  // print: note msd first
+  std::cout << "We want to increment the number:" << std::endl;
+  for (int i = digits.size() - 1; i >= 0; --i) {
+    std::cout << digits.at(i);
+  }
+  std::cout << std::endl;
+
+  // Increment
+  IncrementArrayNumber(&digits, base);
+
+  // print: result
+  std::cout << "Result:" << std::endl;
+  for (int i = digits.size() - 1; i >= 0; --i) {
+    std::cout << digits.at(i);
+  }
+  std::cout << std::endl;
+
   return;
 }
 
@@ -405,6 +449,30 @@ int FindPivotAndPartition(std::vector<int>* vec_ptr, int i_start, int i_end) {
 }
 
 
+/*
+  Incrementing a number is easy. The only caveat is to mind the
+  carryover 1.
+*/
+void IncrementArrayNumber(std::vector<int>* vec_ptr, const int base) {
+  std::vector<int>& vec = *vec_ptr;
+  int i = 0;
+  int carryover = 0;
+  do {
+    int digit_sum = vec.at(i) + 1;
+    carryover = digit_sum / base;
+    vec.at(i++) = digit_sum % base;    
+  } while (carryover && i < vec.size());
+  // if we reached msd and still have carryover, we need one more digit
+  if (carryover) {
+    vec.emplace_back(1);
+  }
+  return;
+}
+
+
+/*
+  Standard Swap 
+*/
 void SwapInt(int* a, int* b) {
   const int temp = *a;
   *a = *b;

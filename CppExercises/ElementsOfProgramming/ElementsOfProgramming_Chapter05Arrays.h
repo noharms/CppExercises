@@ -7,6 +7,7 @@ void ElementsOfProgrammingChapter05Arrays();
 void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr);
 void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr);
 void ElementsOfProgrammingChapter05Arrays_QuickSort(std::vector<int>* vec_ptr);
+void ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber();
 
 
 void BubbleSort(std::vector<int>* vec_ptr);
@@ -19,6 +20,9 @@ void MergeTwoSortedHalves(std::vector<int>* vec_ptr, const int i_start,
 void QuickSort_FirstTry(std::vector<int>* vec_ptr);
 void QuickSort(std::vector<int>* vec_ptr, int ll, int rr);
 int FindPivotAndPartition(std::vector<int>* vec_ptr, int ll, int rr);
-void SwapInt(int* a, int* b);
 
+void IncrementArrayNumber(std::vector<int>* vec_ptr, const int base);
+
+
+void SwapInt(int* a, int* b);
 void PrintVector(const std::vector<int>* vec_ptr);
