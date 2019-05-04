@@ -53,7 +53,7 @@ void ElementsOfProgrammingChapter05Arrays() {
   PrintVector(&rand_vec);
   rand_vec = rand_vec_backup;
 
-  //---------------------------------- OTHER ARRAY EXERCISES
+  //-------------------------- ARBITRARY ARITHMETIC EXERCISES
 
   //--------- Exercise: Increment digit array
   std::cout << "------------------------------" << std::endl;
@@ -72,7 +72,26 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "-- Exercise: Multiplication of two digit arrays" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays();
+
+  //---------------------------------- OTHER ARRAY EXERCISES
   
+  //--------- Exercise: Jumping through array
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: jumping through array" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_JumpThroughArray();
+  
+  //--------- Exercise: best profit in stock price course
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: best profit" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_BestBuyAndSellOfStock(&rand_vec);
+  
+  //--------- Exercise: remove duplicates from array
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: remove duplicates" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec();
 
   return;
 
@@ -224,6 +243,106 @@ void ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays() {
 
   return;
 }
+
+
+/*
+  Exercise description:
+
+  given array of positive ints, let the numbers represent how far you are
+  able to jump forward from that position.
+
+  Test if there is a sequence of jumps that allows you to reach the last element.
+
+*/
+void ElementsOfProgrammingChapter05Arrays_JumpThroughArray() {
+
+  // create random vector
+  std::vector<int> rand_vec;
+  const int vec_len = 20;
+  const int rand_max = 5;
+  for (int i = 0; i < vec_len; ++i) {
+    rand_vec.emplace_back(rand() % rand_max);
+  }
+
+  // print
+  PrintVector(&rand_vec);
+
+  // check
+  //bool end_is_reachable = IsJumpToEndPossible(&rand_vec);
+  bool end_is_reachable = IsJumpToEndPossible_BetterBestCase(&rand_vec);
+
+  // print
+  if (end_is_reachable) {
+    std::cout << "Yes, the end of the array is reachable by jumps." << std::endl;
+  }
+  else {
+    std::cout << "No, the end is not reachable." << std::endl;
+  }
+
+  return;
+}
+
+
+/*
+  Exercise description:
+
+  given an array of positive integers, let the numbers represent the stock
+  price of some share on consecutive days. 
+
+  Find the best profit that could have been made along the course, and return
+  the buy day and the sell day.
+*/
+void ElementsOfProgrammingChapter05Arrays_BestBuyAndSellOfStock(std::vector<int>* vec_ptr) {
+
+  // print the vector
+  PrintVector(vec_ptr);
+
+  // find indices
+  std::pair<int, int> buy_sell_pair = FindBestBuyAndSellIndices(vec_ptr);
+  int buy_index = buy_sell_pair.first;
+  int sell_index = buy_sell_pair.second;
+
+  // print answer
+  std::cout << "The best profit is: " << (*vec_ptr).at(sell_index) - (*vec_ptr).at(buy_index);
+  std::cout << std::endl;
+  std::cout << "Indices: " << buy_index << " " << sell_index << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  Given a sorted array, remove all duplicates. The resulting array
+  should be of the same length, but filled up with 0's from the end for
+  the removed duplicates.
+
+*/
+void ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec() {
+
+  // create random vector
+  std::vector<int> rand_vec;
+  const int vec_len = 20;
+  const int rand_max = 8;
+  for (int i = 0; i < vec_len; ++i) {
+    rand_vec.emplace_back(rand() % rand_max);
+  }
+
+  // sort the vector
+  QuickSort(&rand_vec, 0, rand_vec.size() - 1);
+  
+  // print
+  PrintVector(&rand_vec);
+
+  // remove duplicates
+  RemoveDuplicatesFromSortedVector(&rand_vec);
+
+  // print
+  PrintVector(&rand_vec);
+
+  return;
+}
+
 
 /**
  *----------------------------------------------------------------------------------------------
@@ -647,6 +766,128 @@ std::vector<int> MultiplyDigitArrayTimesDigit(std::vector<int>* vec_ptr_1,
   return product;
 }
 
+/*
+  let elements contain the maximum steps you can jump forward from there:
+
+  {1, 2, 0, 0, 3, 1}  --> you could never reach beyond 4th element.
+
+  Idea is that only 0's can stop us. So go from end and check if you
+  always find an earlier element that allows to jump here. if you
+  reach to the first element this way, there is a way.
+
+  -> O(n), in best, worst and average case; always go to first element
+
+*/
+bool IsJumpToEndPossible(const std::vector<int>* vec_ptr) {
+  const std::vector<int>& vec = *vec_ptr;
+  int idx_under_check = vec.size() - 1;
+  int distance_to_idx_under_check = 0;
+  for (int i = idx_under_check - 1; i >= 0; --i) {
+    ++distance_to_idx_under_check;
+    if (vec.at(i) >= distance_to_idx_under_check) {
+      idx_under_check = i;
+      distance_to_idx_under_check = 0;
+    }
+  }
+  return (distance_to_idx_under_check == 0 ? true : false);
+}
+
+/*
+  -> O(n) in average and worst case, but O(1) in best case
+*/
+bool IsJumpToEndPossible_BetterBestCase(const std::vector<int>* vec_ptr) {
+  const std::vector<int>& vec = *vec_ptr;
+  int max_idx_reachable_sofar = 0;
+  for (int i = 0; i < vec.size(); ++i) {
+    if (max_idx_reachable_sofar < i) {
+      break;
+    }
+    int idx_reachable_from_i = i + vec.at(i);
+    max_idx_reachable_sofar = std::max(max_idx_reachable_sofar, idx_reachable_from_i);
+    if (max_idx_reachable_sofar >= vec.size() - 1) { // already proven
+      break;
+    }    
+  }
+  return max_idx_reachable_sofar >= vec.size() - 1 ? true : false;
+}
+
+/*
+  we can simply traverse the array and track the minimum and the profit
+  if we were to sell now and then compare against the best profit seen so far.
+
+  -> O(n)
+*/
+std::pair<int, int> FindBestBuyAndSellIndices(const std::vector<int>* vec_ptr) {
+
+  const std::vector<int>& vec = *vec_ptr;
+   
+  int min_price_sofar = vec.at(0);
+  int index_min_sofar = 0;
+  int best_sell = 0;
+  int index_best_sell = 0;
+  int index_best_buy = 0;
+
+  for (int i = 1; i < (int)vec.size(); ++i) {
+    int current_price = vec.at(i);
+    if (current_price < min_price_sofar) { // new minimum found
+      min_price_sofar = current_price;
+      index_min_sofar = i;
+    }
+    else {
+      int current_sell = current_price - min_price_sofar;
+      if (current_sell > best_sell) { // new highest jump found
+        best_sell = current_sell;
+        index_best_buy = index_min_sofar;
+        index_best_sell = i;
+      }
+    }
+  }
+
+  return { index_best_buy, index_best_sell };
+}
+
+/*
+  If one would allow O(n) extra space, this would be easy.
+  
+  Without extra space, one needs the following key insight:
+  as soon as there is a single duplicate, all following
+  elements need to be shifted. an efficient way will be
+  to not shift at the moment you find a duplicate, but
+  rather keep track of where the duplicates are and once
+  you reach a non-duplicate move it to the first of
+  the overwritable elements.
+
+*/
+void RemoveDuplicatesFromSortedVector(std::vector<int>* vec_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  
+  int prev_val = vec.at(0);
+  bool duplicate_found = false;
+  int idx_duplicate = 0;
+  for (int i = 1; i < vec.size(); ++i) {
+    int val = vec.at(i);
+    if (val == prev_val) {
+      if (duplicate_found == false) {
+        duplicate_found = true;
+        idx_duplicate = i;
+        vec.at(i) = 0;
+        // note: prev_val not updated
+      }
+      else {
+        vec.at(i) = 0;
+      }
+    }
+    else {
+      prev_val = val;
+      if (duplicate_found) {        
+        SwapInt(&(vec.at(i)), &(vec.at(idx_duplicate)));
+        ++idx_duplicate;
+      }
+    }
+  }
+
+  return;
+}
 
 /*
   Standard Swap 
