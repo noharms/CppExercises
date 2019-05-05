@@ -258,11 +258,14 @@ void ElementsOfProgrammingChapter05Arrays_JumpThroughArray() {
 
   // create random vector
   std::vector<int> rand_vec;
-  const int vec_len = 20;
+  const int vec_len = 7;
   const int rand_max = 5;
   for (int i = 0; i < vec_len; ++i) {
-    rand_vec.emplace_back(rand() % rand_max);
+    rand_vec.emplace_back(rand() % rand_max + 1);
   }
+
+  // Hard example: 4 jumps needed !
+  // rand_vec = { 2, 3, 2, 2, 1, 1, 4 };
 
   // print
   PrintVector(&rand_vec);
@@ -270,10 +273,12 @@ void ElementsOfProgrammingChapter05Arrays_JumpThroughArray() {
   // check
   //bool end_is_reachable = IsJumpToEndPossible(&rand_vec);
   bool end_is_reachable = IsJumpToEndPossible_BetterBestCase(&rand_vec);
+  int min_jumps_needed = MinNumberOfJumpsToReachEnd(&rand_vec);
 
   // print
   if (end_is_reachable) {
-    std::cout << "Yes, the end of the array is reachable by jumps." << std::endl;
+    std::cout << "Yes, end of array reachable.";
+    std::cout << "(minimum " << min_jumps_needed << " jumps needed)" << std::endl;
   }
   else {
     std::cout << "No, the end is not reachable." << std::endl;
@@ -291,8 +296,17 @@ void ElementsOfProgrammingChapter05Arrays_JumpThroughArray() {
 
   Find the best profit that could have been made along the course, and return
   the buy day and the sell day.
+
+  Exercise 2:
+
+  Repeat the exercise, but now you are allowed to buy and sell at most twice,
+  where the 2nd buy must be after the first sale.
 */
 void ElementsOfProgrammingChapter05Arrays_BestBuyAndSellOfStock(std::vector<int>* vec_ptr) {
+
+  // Hard example: 4 jumps needed !
+  //*vec_ptr = { 6, 2, 15, 16, 15, 21, 12, 4, 17, 9 };
+  //*vec_ptr = { 5, 0, 22, 8, 22, 20, 13, 17, 13, 25 };
 
   // print the vector
   PrintVector(vec_ptr);
@@ -301,11 +315,23 @@ void ElementsOfProgrammingChapter05Arrays_BestBuyAndSellOfStock(std::vector<int>
   std::pair<int, int> buy_sell_pair = FindBestBuyAndSellIndices(vec_ptr);
   int buy_index = buy_sell_pair.first;
   int sell_index = buy_sell_pair.second;
+  int profit = (*vec_ptr).at(sell_index) - (*vec_ptr).at(buy_index);
 
   // print answer
-  std::cout << "The best profit is: " << (*vec_ptr).at(sell_index) - (*vec_ptr).at(buy_index);
+
+  std::cout << "If one buysell is allowed, the max profit is: " << profit;
   std::cout << std::endl;
   std::cout << "Indices: " << buy_index << " " << sell_index << std::endl;
+  
+  // find indices
+  TwoBuysAndSellsType result = FindBestBuyAndSellIndicesTwoTimes(vec_ptr);
+  profit = (*vec_ptr).at(result.sell_1) - (*vec_ptr).at(result.buy_1)
+    + (*vec_ptr).at(result.sell_2) - (*vec_ptr).at(result.buy_2);
+  
+  // print answer
+  std::cout << "If two buysells are allowed, the max is " << profit << std::endl;
+  std::cout << "Indices 1: " << result.buy_1 << " " << result.sell_1 << std::endl;
+  std::cout << "Indices 2: " << result.buy_2 << " " << result.sell_2 << std::endl;
 
   return;
 }
@@ -335,7 +361,8 @@ void ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec() {
   PrintVector(&rand_vec);
 
   // remove duplicates
-  RemoveDuplicatesFromSortedVector(&rand_vec);
+  //RemoveDuplicatesFromSortedVector(&rand_vec);
+  RemoveDuplicatesFromSortedVector_textbook(&rand_vec);
 
   // print
   PrintVector(&rand_vec);
@@ -798,17 +825,59 @@ bool IsJumpToEndPossible(const std::vector<int>* vec_ptr) {
 bool IsJumpToEndPossible_BetterBestCase(const std::vector<int>* vec_ptr) {
   const std::vector<int>& vec = *vec_ptr;
   int max_idx_reachable_sofar = 0;
-  for (int i = 0; i < vec.size(); ++i) {
-    if (max_idx_reachable_sofar < i) {
+  for (size_t i = 0; i < vec.size(); ++i) {
+    if (max_idx_reachable_sofar < (int)i) {
       break;
     }
     int idx_reachable_from_i = i + vec.at(i);
     max_idx_reachable_sofar = std::max(max_idx_reachable_sofar, idx_reachable_from_i);
-    if (max_idx_reachable_sofar >= vec.size() - 1) { // already proven
+    if (max_idx_reachable_sofar >= (int)(vec.size() - 1)) { // already proven
       break;
     }    
   }
-  return max_idx_reachable_sofar >= vec.size() - 1 ? true : false;
+  return max_idx_reachable_sofar >= (int)(vec.size() - 1) ? true : false;
+}
+
+/*
+  idea is to keep track of the maximum index reachable so far. if this 
+  index is smaller than the end, we at least need one more jump.
+  in fact, we have to traverse all elements until the current maximum index
+  reachable so far and check which of the elements allows the farthest next jump.
+  if that jump does not reach the end, we certainly need one more jump and
+  then need to check how many additional more.
+*/
+int MinNumberOfJumpsToReachEnd(const std::vector<int>* vec_ptr) {
+  const std::vector<int>& vec = *vec_ptr;
+
+  int max_idx_reachable_withcurrjump = vec.at(0);
+  int max_idx_reachable_withnextjump = -1;
+  int n_jumps_needed = 1;
+
+  for (int i = 0; i < (int)vec.size(); ++i) {
+    if (max_idx_reachable_withnextjump >= (int)(vec.size() - 1)) {
+      ++n_jumps_needed;
+      // this jump is enough to reach the end      
+      break;
+    }
+    if (i <= max_idx_reachable_withcurrjump) {
+      max_idx_reachable_withnextjump = std::max(max_idx_reachable_withnextjump, i + vec.at(i));
+    }
+    else {
+      if (i <= max_idx_reachable_withnextjump) {
+        // to reach this index one more jump was needed
+        ++n_jumps_needed;
+        max_idx_reachable_withcurrjump = max_idx_reachable_withnextjump;
+        max_idx_reachable_withnextjump = i + vec.at(i);
+      }
+      else {
+        // there is no jump that leads us here, cannot reach end
+        n_jumps_needed = -1;
+        break;
+      }      
+    }
+  }
+
+  return n_jumps_needed;
 }
 
 /*
@@ -847,6 +916,103 @@ std::pair<int, int> FindBestBuyAndSellIndices(const std::vector<int>* vec_ptr) {
 }
 
 /*
+  idea: 
+
+  the main difficulty is that after a complete round through the array
+  we may have found the best single buy-sell pair, but when two buys-sells are
+  allowed we have still no clue where they would be ! e.g. could 
+  be possible that the two buy-sells are somewhere in the range spanned
+  by the single best buy-sell
+
+                  x
+    x        x   xx
+   xxx     xxxx xxxxx
+  abcdefghijklmnopqrstu
+       xxxx    x    x
+        xx
+        x
+
+  --> single best buy-sell from g-q
+  --> double best buy-sell from g-l , n-q
+
+  The problem can be solved as an optimisation problem:
+  calculate for each day how much the first sell would maximally give
+  if the array would end that day and then check how much the second
+  sell would maximally give if the second buy would have to
+  be in the remaining array. this way you know where to split
+  the array so that a buy in the first part combined with a buy 
+  in the second part brings the maximum profit.
+
+  -> needs O(n) additional space
+*/
+TwoBuysAndSellsType FindBestBuyAndSellIndicesTwoTimes(const std::vector<int>* vec_ptr) {
+  const std::vector<int>& vec = *vec_ptr;
+  
+  // compute maximum profit for each day thinking it was the last for sell
+  int maxprofit_possible_sofar = 0;
+  int min_price_sofar = vec.at(0);
+  std::vector<int> maxprofits_possible_sell1untiltoday(vec.size(), -1);
+  for (size_t i = 1; i < vec.size(); ++i) {
+    int price_at_i = vec.at(i);
+    // at each step, two things can happen:
+    // i) new min_price
+    // ii) old min_price but possibly higher profit because current value is new max
+    if (price_at_i < min_price_sofar) {
+      min_price_sofar = price_at_i;      
+    }
+    else {
+      int maxprofit_selltoday = price_at_i - min_price_sofar;
+      maxprofit_possible_sofar = std::max(maxprofit_possible_sofar, maxprofit_selltoday);
+    }
+    maxprofits_possible_sell1untiltoday.at(i) = maxprofit_possible_sofar;
+  }
+
+  // compute maximum profit for each day thinking it was the first for buy
+  int max_price_sofar = vec.at(vec.size() - 1);
+  std::vector<int> maxprofits_possible_buy2allowed_fromhere(vec.size(), -1);
+  maxprofit_possible_sofar = 0;
+  for (size_t i = vec.size() - 2; i > 0; --i) {
+    int price_at_i = vec.at(i);
+    // at each step, two things can happen:
+    // i) new max_price
+    // ii) old max_price but possibly higher profit because current value is new min
+    if (price_at_i > max_price_sofar) {
+      max_price_sofar = price_at_i;
+    }
+    else {
+      int maxprofit_buytoday = max_price_sofar - price_at_i;
+      maxprofit_possible_sofar = std::max(maxprofit_possible_sofar, maxprofit_buytoday);
+    }
+    maxprofits_possible_buy2allowed_fromhere.at(i) = maxprofit_possible_sofar;
+  }
+  
+  // compute the total maximum possible for each day
+  std::vector<int> maxprofits_possible_total(vec.size(), -1);
+  for (size_t i = 1; i < vec.size() - 1; ++i) {
+    int maxprofit_selluntiltoday_buyfromtomorrow =
+      maxprofits_possible_sell1untiltoday.at(i)
+      + maxprofits_possible_buy2allowed_fromhere.at(i + 1);
+    maxprofits_possible_total.at(i) = maxprofit_selluntiltoday_buyfromtomorrow;
+  }
+
+  // find the optimum split day
+  int split_day = std::max_element(maxprofits_possible_total.begin(), maxprofits_possible_total.end()) - maxprofits_possible_total.begin();
+
+  // find indices for buys/sells
+  std::vector<int> part_1(vec.begin(), vec.begin() + split_day + 1);
+  std::vector<int> part_2(vec.begin() + split_day + 1, vec.end());
+  std::pair<int, int> buysell_1 = FindBestBuyAndSellIndices(&part_1);
+  std::pair<int, int> buysell_2 = FindBestBuyAndSellIndices(&part_2);
+
+  TwoBuysAndSellsType result;
+  result.buy_1 = buysell_1.first;
+  result.buy_2 = buysell_2.first + part_1.size();
+  result.sell_1 = buysell_1.second;
+  result.sell_2 = buysell_2.second + part_1.size();
+  return result;
+}
+
+/*
   If one would allow O(n) extra space, this would be easy.
   
   Without extra space, one needs the following key insight:
@@ -864,7 +1030,7 @@ void RemoveDuplicatesFromSortedVector(std::vector<int>* vec_ptr) {
   int prev_val = vec.at(0);
   bool duplicate_found = false;
   int idx_duplicate = 0;
-  for (int i = 1; i < vec.size(); ++i) {
+  for (size_t i = 1; i < vec.size(); ++i) {
     int val = vec.at(i);
     if (val == prev_val) {
       if (duplicate_found == false) {
@@ -886,6 +1052,18 @@ void RemoveDuplicatesFromSortedVector(std::vector<int>* vec_ptr) {
     }
   }
 
+  return;
+}
+
+void RemoveDuplicatesFromSortedVector_textbook(std::vector<int>* vec_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  int write_index = 1;
+  for (size_t i = 1; i < vec.size(); ++i) {
+    if (vec.at(i) != vec.at(write_index - 1)) {
+      vec.at(write_index++) = vec.at(i);
+    }
+    vec.at(i) = -1;
+  }
   return;
 }
 

@@ -2,6 +2,13 @@
 
 #include <vector>
 
+typedef struct TWO_BUYS_SELLS {
+  int buy_1;
+  int buy_2;
+  int sell_1;
+  int sell_2;
+} TwoBuysAndSellsType;
+
 void ElementsOfProgrammingChapter05Arrays();
 
 void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr);
@@ -36,8 +43,11 @@ std::vector<int> MultiplyDigitArrayTimesDigit(std::vector<int>* vec_ptr_1,
 
 bool IsJumpToEndPossible(const std::vector<int>* vec_ptr);
 bool IsJumpToEndPossible_BetterBestCase(const std::vector<int>* vec_ptr);
+int MinNumberOfJumpsToReachEnd(const std::vector<int>* vec_ptr);
 std::pair<int, int> FindBestBuyAndSellIndices(const std::vector<int>* vec_ptr);
+TwoBuysAndSellsType FindBestBuyAndSellIndicesTwoTimes(const std::vector<int>* vec_ptr);
 void RemoveDuplicatesFromSortedVector(std::vector<int>* vec_ptr);
+void RemoveDuplicatesFromSortedVector_textbook(std::vector<int>* vec_ptr);
 
 void SwapInt(int* a, int* b);
 void PrintVector(const std::vector<int>* vec_ptr);
