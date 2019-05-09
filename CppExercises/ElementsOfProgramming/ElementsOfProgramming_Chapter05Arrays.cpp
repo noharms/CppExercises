@@ -32,8 +32,7 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: Bubble Sort" << std::endl;
   std::cout << "------------------------------" << std::endl;
-  ElementsOfProgrammingChapter05Arrays_BubbleSort(&rand_vec);
-  PrintVector(&rand_vec);
+  ElementsOfProgrammingChapter05Arrays_BubbleSort(&rand_vec);  
   rand_vec = rand_vec_backup;
 
 
@@ -42,18 +41,23 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "-- Exercise: Merge Sort" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_MergeSort(&rand_vec);
-  PrintVector(&rand_vec);
   rand_vec = rand_vec_backup;
   
   //--------- Exercise: Quick-Sort
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: Quick-Sort" << std::endl;
   std::cout << "------------------------------" << std::endl;
-  ElementsOfProgrammingChapter05Arrays_QuickSort(&rand_vec);
-  PrintVector(&rand_vec);
+  ElementsOfProgrammingChapter05Arrays_QuickSort(&rand_vec);  
   rand_vec = rand_vec_backup;
 
-  //-------------------------- ARBITRARY ARITHMETIC EXERCISES
+  //--------- Exercise: establish alternating order
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: alternating order" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_EstablishAlternatingOrder(&rand_vec);
+  rand_vec = rand_vec_backup;
+
+  //-------------------------------- ARBITRARY-PREC ARITHMETIC EXERCISES
 
   //--------- Exercise: Increment digit array
   std::cout << "------------------------------" << std::endl;
@@ -73,7 +77,7 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays();
 
-  //---------------------------------- OTHER ARRAY EXERCISES
+  //-------------------------------------------- OTHER ARRAY EXERCISES
   
   //--------- Exercise: Jumping through array
   std::cout << "------------------------------" << std::endl;
@@ -92,6 +96,13 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "-- Exercise: remove duplicates" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec();
+  
+  //--------- Exercise: Enumerate Primes
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Enumerate Primes" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_EnumeratePrimes();
+
 
   return;
 
@@ -112,6 +123,7 @@ void ElementsOfProgrammingChapter05Arrays() {
 */
 void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr) {
   BubbleSort(vec_ptr);
+  PrintVector(vec_ptr);
   return;
 }
 
@@ -121,6 +133,7 @@ void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr) 
 void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr) {
   //*vec_ptr = MergeSort_FirstTry(*vec_ptr);
   MergeSort(vec_ptr, 0, (*vec_ptr).size() - 1);
+  PrintVector(vec_ptr);
   return;
 }
 
@@ -130,6 +143,28 @@ void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr) {
 void ElementsOfProgrammingChapter05Arrays_QuickSort(std::vector<int>* vec_ptr) {
   //QuickSort_FirstTry(vec_ptr);
   QuickSort(vec_ptr, 0, (*vec_ptr).size() - 1);
+  PrintVector(vec_ptr);
+  return;
+}
+
+
+/*
+  Exercise description:
+
+  Given an array, reorder the elements such that
+    A_i <= A_i+1 , i even
+    A_i >= A_i+1 , i odd
+
+  A_0 <= A_1 >= A_2 <= A_3 >= A_4 <= ..
+*/
+void ElementsOfProgrammingChapter05Arrays_EstablishAlternatingOrder(std::vector<int>* vec_ptr) {
+  
+  // reorder
+  EstablishAlternatingOrder(vec_ptr);
+
+  // print the vector
+  PrintVector(vec_ptr);
+
   return;
 }
 
@@ -370,6 +405,24 @@ void ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec() {
   return;
 }
 
+
+/*
+  Exercise description:
+
+  given a positive integer n, enumerate all prime numbers < n.
+
+*/
+void ElementsOfProgrammingChapter05Arrays_EnumeratePrimes() {
+  
+  // return an array containing the primes
+  const int n = 1000;
+  const std::vector<int> primes = ComputePrimes(n);
+
+  // print  
+  PrintVector(&primes);
+
+  return;
+}
 
 /**
  *----------------------------------------------------------------------------------------------
@@ -681,6 +734,41 @@ int FindPivotAndPartition(std::vector<int>* vec_ptr, int i_start, int i_end) {
   return i_start;
 }
 
+/*
+  Idea: 
+
+  to obtain the ordering 
+
+  A_0 <= A_1 >= A_2 <= A_3 >= A_4 <= ..
+
+  we can always work locally with just looking at two elements !!!
+
+  the start is clear:
+
+  slots 0, 1: if A_0 <= A_1 , continue, if A_0 > A_1 swap.
+  slots 1, 2: if A_1 >= A_2 , continue, if A_1 < A_2 swap 
+
+  --> the key insight is that we can swap again without destroying the
+      order with the previous element because if A_1 >= A_0 and A_2 > A_1 
+      then A_2 > A_1 >= A_0 so that both A_2 and A_1 can be put next to A_0
+
+*/
+void EstablishAlternatingOrder(std::vector<int>* vec_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  for (size_t i = 0; i < vec.size() - 1; ++i) {
+    if (i % 2 == 0) {
+      if (vec.at(i) > vec.at(i + 1)) {
+        SwapInt(&(vec.at(i)), &(vec.at(i + 1)));
+      }
+    }
+    else {
+      if (vec.at(i) < vec.at(i + 1)) {
+        SwapInt(&(vec.at(i)), &(vec.at(i + 1)));
+      }
+    }
+  }
+  return;
+}
 
 /*
   Incrementing a number is easy. The only caveat is to mind the
@@ -749,7 +837,7 @@ std::vector<int> AddDigitArrays(std::vector<int>* vec_ptr_1,
                + (abcde * h) * 10^0
 
 */
-std::vector<int> MultiplyDigitArrays(std::vector<int>* vec_ptr_1,
+std::vector<int> MultiplyDigitArrays_RestrictResultVectorDigitsToBeSmallerThanBase(std::vector<int>* vec_ptr_1,
   std::vector<int>* vec_ptr_2, const int base) {
   
   std::vector<int>& vec_big = (*vec_ptr_1).size() > (*vec_ptr_2).size() ? *vec_ptr_1 : *vec_ptr_2;
@@ -790,6 +878,40 @@ std::vector<int> MultiplyDigitArrayTimesDigit(std::vector<int>* vec_ptr_1,
     product.insert(product.begin(), carryover);
   }
 
+  return product;
+}
+
+/*
+  idea: 
+  
+  multiply digit by digit and continuously add to the result vector
+  
+  Note convention:
+
+  { MSD at index 0, ..., LSD at index size() -1 } 
+
+*/
+std::vector<int> MultiplyDigitArrays(std::vector<int>* vec_ptr_1,
+  std::vector<int>* vec_ptr_2, const int base) {
+  const std::vector<int>& vec_1 = *vec_ptr_1;
+  const std::vector<int>& vec_2 = *vec_ptr_2;  
+  const int max_digits_product = vec_1.size() + vec_2.size();
+  std::vector<int> product(max_digits_product, 0);
+  // start with the LSD's, so they go to last slot in product
+  for (int i = (int)vec_1.size() - 1; i >= 0; --i) {    
+    for (int j = (int)vec_2.size() - 1; j >= 0; --j) {            
+      product.at(i + j + 1) += vec_1.at(i) * vec_2.at(j);
+    }
+  }
+  // carry-over the values that have become larger than base
+  for (int k = max_digits_product - 1; k > 0; --k) {
+    product.at(k - 1) += product.at(k) / base;
+    product.at(k) %= base;
+  }
+  if (product.at(0) > base) {
+    // should not reach here, if logic is correct
+    std::cout << "Error: should not reach here." << std::endl;
+  }
   return product;
 }
 
@@ -1068,6 +1190,50 @@ void RemoveDuplicatesFromSortedVector_textbook(std::vector<int>* vec_ptr) {
 }
 
 /*
+  idea: 
+
+  the brute-force approach would be to go through all numbers < n and test if
+  it is a prime. the test if it is a prime is O(n^1/2), so over all  O(n^3/2)
+
+  we cannot improve very much, but allowing us O(n) extra space, we
+  can remove with each new number p all multiples of it from the candidates,
+  i.e. remove n/p candidates. we do not need to test if a number is prime,
+  we automatically know it, if we reach there and it is not already outruled to
+  be a candidate.
+
+  So first we need to outrule O(n/2), then O(n/3), then O(n/5), ... . Turns out
+  this is 
+
+  --> O(n) * log log (n)
+
+*/
+std::vector<int> ComputePrimes(const int n) {
+  // take care: huge memory costs! n <= int_max =2G,
+  //            with at least 8G RAM no problem
+  std::vector<bool> candidates(n, 1);
+  candidates.at(0) = 0;
+  candidates.at(1) = 0;  
+  // go through
+  std::vector<int> primes_found;
+  for (long i = 2; i < n; ++i) {
+    if (candidates.at(i)) {
+      primes_found.emplace_back(i);
+      // remove multiples from the candidate list
+      // note: it is enough to start at index p^2 
+      // because for each k < p, all mutliples have
+      // already been erased, i.e. also p*k;
+      // thus we can start with p*p to erase further
+      // candidates and save some time
+      for (long multiple = i * i; multiple < n; multiple += i) {
+        candidates.at(multiple) = 0;
+      }
+    }
+  }
+  return primes_found;
+}
+
+
+/*
   Standard Swap 
 */
 void SwapInt(int* a, int* b) {
@@ -1091,7 +1257,7 @@ void PrintVectorOfDigitsMSDat0(const std::vector<int>* vec_ptr) {
   const std::vector<int>& vec = *vec_ptr;
   for (size_t i = 0; i < vec.size(); ++i) {
     if (vec.at(i) >= 10) {
-      std::cout << "(>10)" << std::endl;
+      std::cout << "(>10)";
     }
     else {
       std::cout << vec.at(i);
