@@ -14,7 +14,10 @@ void ElementsOfProgrammingChapter05Arrays();
 void ElementsOfProgrammingChapter05Arrays_BubbleSort(std::vector<int>* vec_ptr);
 void ElementsOfProgrammingChapter05Arrays_MergeSort(std::vector<int>* vec_ptr);
 void ElementsOfProgrammingChapter05Arrays_QuickSort(std::vector<int>* vec_ptr);
+
 void ElementsOfProgrammingChapter05Arrays_EstablishAlternatingOrder(std::vector<int>* vec_ptr);
+void ElementsOfProgrammingChapter05Arrays_ApplyPermutation(std::vector<int>* vec_ptr);
+void ElementsOfProgrammingChapter05Arrays_FindNextPermutation(std::vector<int>* vec_ptr);
 
 void ElementsOfProgrammingChapter05Arrays_IncrementArrayNumber();
 void ElementsOfProgrammingChapter05Arrays_AdditionDigitArrays();
@@ -34,7 +37,13 @@ void MergeTwoSortedHalves(std::vector<int>* vec_ptr, const int i_start,
 void QuickSort_FirstTry(std::vector<int>* vec_ptr);
 void QuickSort(std::vector<int>* vec_ptr, int ll, int rr);
 int FindPivotAndPartition(std::vector<int>* vec_ptr, int ll, int rr);
+
 void EstablishAlternatingOrder(std::vector<int>* vec_ptr);
+void ApplyPermutationInplace(std::vector<int>* vec_ptr, std::vector<int>* perm_ptr);
+void ApplyPermutationInplace_FirstTry(std::vector<int>* vec_ptr, std::vector<int>* perm_ptr);
+void ApplyPermutationExtraSpace(std::vector<int>* vec_ptr, std::vector<int>* perm_ptr);
+void FindNextPermutation(std::vector<int>* vec_ptr);
+void FindNextPermutation_FirstTry(std::vector<int>* vec_ptr);
 
 void IncrementArrayNumber(std::vector<int>* vec_ptr, const int base);
 std::vector<int> AddDigitArrays(std::vector<int>* vec_ptr_1,

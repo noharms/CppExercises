@@ -50,11 +50,27 @@ void ElementsOfProgrammingChapter05Arrays() {
   ElementsOfProgrammingChapter05Arrays_QuickSort(&rand_vec);  
   rand_vec = rand_vec_backup;
 
+  //----------------------------------- REORDERING EXERCISES
+
   //--------- Exercise: establish alternating order
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: alternating order" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_EstablishAlternatingOrder(&rand_vec);
+  rand_vec = rand_vec_backup;
+
+  //--------- Exercise: Apply a permutation
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Apply a permutation" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_ApplyPermutation(&rand_vec);
+  rand_vec = rand_vec_backup;
+
+  //--------- Exercise: Find next in dictionary-ordering
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Find next in dictionary-ordering" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_FindNextPermutation(&rand_vec);
   rand_vec = rand_vec_backup;
 
   //-------------------------------- ARBITRARY-PREC ARITHMETIC EXERCISES
@@ -102,8 +118,7 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "-- Exercise: Enumerate Primes" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_EnumeratePrimes();
-
-
+  
   return;
 
 }
@@ -161,6 +176,82 @@ void ElementsOfProgrammingChapter05Arrays_EstablishAlternatingOrder(std::vector<
   
   // reorder
   EstablishAlternatingOrder(vec_ptr);
+
+  // print the vector
+  PrintVector(vec_ptr);
+
+  return;
+}
+
+
+/*
+  Exercise description:
+
+  given an array of length n, and a permutation instruction,
+  which comes also in the form of an array of length n where
+  the ith entry tells you the index-after-permutation of
+  the ith entry in the given array.
+
+  e.g. permutation { 2, 1, 0} applied to {45, 2, 3} gives {3, 2, 45}
+
+*/
+void ElementsOfProgrammingChapter05Arrays_ApplyPermutation(std::vector<int>* vec_ptr) {
+
+  // print the array
+  std::cout << "Permute the following vector" << std::endl;
+  PrintVector(vec_ptr);
+
+  // create a random permutation
+  const int vec_size = (*vec_ptr).size();
+  std::vector<int> permutation;
+  for (int i = 0; i < vec_size; ++i) {
+    permutation.emplace_back(i);
+  }
+  for (int i = 0; i < vec_size; ++i) {
+    const int swap_i = rand() % vec_size;
+    const int swap_j = rand() % vec_size;
+    SwapInt(&permutation[0] + swap_i, &permutation[0] + swap_j);
+  }
+
+  // print the permutation
+  std::cout << "Applying the following permutation to the vector" << std::endl;
+  PrintVector(&permutation);
+
+  // Apply permutation
+  //ApplyPermutationExtraSpace(vec_ptr, &permutation);
+  ApplyPermutationInplace(vec_ptr, &permutation);
+
+  // print result
+  std::cout << "Result after permutation:" << std::endl;
+  PrintVector(vec_ptr);
+
+  return;
+}
+
+/*
+  Exercise description: 
+
+  given an array, the dictionary-ordering defines an order among all permutations
+  of the array by comparing entries from left to right, with highest priority being
+  at the left, i.e. given
+
+  { 2, 5, 0, 11, 3} the smallest permutation is {0, 2, 3, 5, 11} and the largest
+  is {11, 5, 3, 2, 0}.
+
+  note: one can not interprete this as a decimal number because the entries may
+  be larger than 10.
+
+  -> find the next larger permutation  
+
+*/
+void ElementsOfProgrammingChapter05Arrays_FindNextPermutation(std::vector<int>* vec_ptr) {
+
+  // test example  
+  *vec_ptr = { 1, 6, 3, 2, 0 };
+  PrintVector(vec_ptr);
+
+  // Reorder
+  FindNextPermutation(vec_ptr);
 
   // print the vector
   PrintVector(vec_ptr);
@@ -388,10 +479,13 @@ void ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec() {
   for (int i = 0; i < vec_len; ++i) {
     rand_vec.emplace_back(rand() % rand_max);
   }
-
+  
   // sort the vector
   QuickSort(&rand_vec, 0, rand_vec.size() - 1);
   
+  // hard test case
+  //rand_vec = { 0, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7 };
+
   // print
   PrintVector(&rand_vec);
 
@@ -405,7 +499,6 @@ void ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec() {
   return;
 }
 
-
 /*
   Exercise description:
 
@@ -415,7 +508,7 @@ void ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec() {
 void ElementsOfProgrammingChapter05Arrays_EnumeratePrimes() {
   
   // return an array containing the primes
-  const int n = 1000;
+  const int n = 30;
   const std::vector<int> primes = ComputePrimes(n);
 
   // print  
@@ -765,6 +858,152 @@ void EstablishAlternatingOrder(std::vector<int>* vec_ptr) {
       if (vec.at(i) < vec.at(i + 1)) {
         SwapInt(&(vec.at(i)), &(vec.at(i + 1)));
       }
+    }
+  }
+  return;
+}
+
+/*
+  idea:
+
+  start with element 0, the permutation
+  tells you to move it to slot j, so do that and continue by checking where
+  the element at slot j that was overwritten has to go instead. this way
+  jump through the array until all elements are moved to their new position.
+
+  problem: what if you arrive at a slot whose element was already permuted ?
+  -> we need to keep track of already permuted slots and in case we reach
+  there again, simply find the next unpermuted index
+
+*/
+void ApplyPermutationInplace(std::vector<int>* vec_ptr, std::vector<int>* perm_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  std::vector<int>& perm = *perm_ptr;    
+  for (int i = 0; i < (int)perm.size(); ++i) {
+    int i_from = i;
+    int val_at_i_from = vec.at(i_from);
+    // permute until we reach a slot that was already permuted
+    while (perm.at(i_from) >= 0) {      
+      int i_target = perm.at(i_from);
+      int cache_target = vec.at(i_target); // save the overwritten value
+      vec.at(i_target) = val_at_i_from;
+      perm.at(i_from) *= -1;
+      // prepare for next round            
+      i_from = i_target;
+      val_at_i_from = cache_target;
+    }
+  }
+  return;
+}
+
+void ApplyPermutationInplace_FirstTry(std::vector<int>* vec_ptr, std::vector<int>* perm_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  std::vector<int>& perm = *perm_ptr;
+  int permutations_done = 0;
+  int i_from = 0;
+  int i_to = perm.at(i_from);
+  int cache_val_old = vec.at(i_from);
+  int min_potentially_unpermuted_idx = 1;
+  const int kAlreadyPermuted = -1;
+  while (1) {
+    // do the permutation
+    int cache_val_new = vec.at(i_to);
+    vec.at(i_to) = cache_val_old;
+    perm.at(i_from) = kAlreadyPermuted;
+    ++permutations_done;
+    if (permutations_done >= (int)perm.size()) {
+      break;
+    }
+    // next round element at i_to would be moved: check if that permutation was done already !
+    if (perm.at(i_to) == kAlreadyPermuted) {
+      while (perm.at(min_potentially_unpermuted_idx) == kAlreadyPermuted) {
+        ++min_potentially_unpermuted_idx;
+      };
+      i_from = min_potentially_unpermuted_idx;
+      i_to = perm.at(i_from);
+      cache_val_old = vec.at(i_from);
+    }
+    else {
+      cache_val_old = cache_val_new;
+      i_from = i_to;
+      i_to = perm.at(i_to);
+    }
+  }
+  return;
+}
+
+/*
+  idea:  with additional O(n) space, we can have a very simple O(n) algorithm
+*/
+void ApplyPermutationExtraSpace(std::vector<int>* vec_ptr, std::vector<int>* perm_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  std::vector<int>& perm = *perm_ptr;
+  std::vector<int> new_vec(vec.size(), 0);
+  for (int i = 0; i < perm.size(); ++i) {
+    new_vec.at(perm.at(i)) = vec.at(i);
+  }
+  vec = new_vec;
+  return;
+}
+
+
+/*
+  idea: 
+
+  we want to get a larger permutation, so we definitely need to swap a larger number
+  from the back with a smaller number from the front. ideally, we want to make the change
+  as far to the right as possible because then we are closest to the original array.
+
+  so, go through the array from right to left until you find a possible swap:
+  a swap is possible if you find an element that is smaller than the previous one
+  (previous means more right here). note this idx and the element and make another round
+  from the right to find which is actually the rightmost element larger than this,
+  now we know which two elements to swap.
+
+  after the swap sort all elements from the element swapped left to get the smallest
+  permutation possible for this subset. note that we do not need a sorting algorithm
+  but can simply reverse order because they are already in decreasing order!
+
+  if we do not find any potential swap, it means the input is the largest possible permutation.
+    
+*/
+void FindNextPermutation(std::vector<int>* vec_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  int i = - 1;
+  for (i = (int)vec.size() - 1; i > 0; --i) {    
+    if (vec.at(i - 1) < vec.at(i)) break;
+  }
+  if (i > 0) {
+    int j = -1;
+    for (j = (int)vec.size() - 1; j > 0; --j) {
+      if (vec.at(j) > vec.at(i - 1)) break;
+    }
+    SwapInt(&vec.at(i - 1), &vec.at(j));
+    std::reverse(vec.begin() + i, vec.end()); // O(n)
+  }
+  else {
+    vec = {};
+  }
+  return;
+}
+
+/*
+   O(n*n)
+ */
+void FindNextPermutation_FirstTry(std::vector<int>* vec_ptr) {
+  std::vector<int>& vec = *vec_ptr;
+  for (int i = (int)vec.size() - 1; i > 0; --i) {
+    int smaller_idx = -1;
+    for (int j = i - 1; j > 0; --j) {
+      if (vec.at(j) < vec.at(i)) {
+        smaller_idx = j;
+        break;
+      }
+    }
+    if (smaller_idx >= 0) {
+      SwapInt(&vec.at(i), &vec.at(smaller_idx));
+      QuickSort(vec_ptr, smaller_idx + 1, vec.size() - 1);
+      break;
     }
   }
   return;
@@ -1184,7 +1423,10 @@ void RemoveDuplicatesFromSortedVector_textbook(std::vector<int>* vec_ptr) {
     if (vec.at(i) != vec.at(write_index - 1)) {
       vec.at(write_index++) = vec.at(i);
     }
-    vec.at(i) = -1;
+    if (i > write_index - 1) {
+      vec.at(i) = -1;
+    }
+    
   }
   return;
 }
@@ -1245,7 +1487,7 @@ void SwapInt(int* a, int* b) {
 
 void PrintVector(const std::vector<int>* vec_ptr) {
   //const std::vector<int> vec = *vec_ptr;
-  std::cout << "Elements of random vector:" << std::endl;
+  std::cout << "Elements of vector:" << std::endl;
   std::for_each(vec_ptr->begin(), vec_ptr->end(), [](const int& vec_elem) {
     std::cout << "  " << vec_elem << std::endl;
   });
