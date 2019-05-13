@@ -73,6 +73,14 @@ void ElementsOfProgrammingChapter05Arrays() {
   ElementsOfProgrammingChapter05Arrays_FindNextPermutation(&rand_vec);
   rand_vec = rand_vec_backup;
 
+  //--------- Exercise: return random subarray at front
+  // NOTE: would only be testable by statistically many repetitions
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Random Subarray at front" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_RandomSubarraryAtFront(&rand_vec);
+  rand_vec = rand_vec_backup;
+
   //-------------------------------- ARBITRARY-PREC ARITHMETIC EXERCISES
 
   //--------- Exercise: Increment digit array
@@ -118,6 +126,13 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "-- Exercise: Enumerate Primes" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_EnumeratePrimes();
+
+  //--------- Exercise: Compute Permutations
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Compute Permutations" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_ComputePermutations();
+  
   
   return;
 
@@ -197,6 +212,9 @@ void ElementsOfProgrammingChapter05Arrays_EstablishAlternatingOrder(std::vector<
 */
 void ElementsOfProgrammingChapter05Arrays_ApplyPermutation(std::vector<int>* vec_ptr) {
 
+  // debug: test case
+  *vec_ptr = { 17, 11, 14, 8, 1, 18, 29, 3, 25, 3 };
+
   // print the array
   std::cout << "Permute the following vector" << std::endl;
   PrintVector(vec_ptr);
@@ -212,6 +230,9 @@ void ElementsOfProgrammingChapter05Arrays_ApplyPermutation(std::vector<int>* vec
     const int swap_j = rand() % vec_size;
     SwapInt(&permutation[0] + swap_i, &permutation[0] + swap_j);
   }
+
+  // debug: test case
+  permutation = { 0, 1, 2, 9, 4, 7, 8, 3, 5, 6 };
 
   // print the permutation
   std::cout << "Applying the following permutation to the vector" << std::endl;
@@ -258,6 +279,27 @@ void ElementsOfProgrammingChapter05Arrays_FindNextPermutation(std::vector<int>* 
 
   return;
 }
+
+/*
+  Exercise description: 
+
+  given an array of length n and a size k < n, find a random subarray of length k,
+  where each possible subarray of that length should be equally likely, and
+  move it to the first k entries of the vector.
+
+*/
+void ElementsOfProgrammingChapter05Arrays_RandomSubarraryAtFront(std::vector<int>* vec_ptr) {
+
+  // Find random subarray and move to front
+  const int k = 4; // rand() % vec_ptr->size();
+  RearrangeRandomSubarrayAtFront(vec_ptr, k);
+
+  // print the vector
+  PrintVector(vec_ptr);
+
+  return;
+}
+
 
 /*
   Exercise description: given an array of digits that represents
@@ -513,6 +555,42 @@ void ElementsOfProgrammingChapter05Arrays_EnumeratePrimes() {
 
   // print  
   PrintVector(&primes);
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  given an array compute all n! permutations
+
+*/
+void ElementsOfProgrammingChapter05Arrays_ComputePermutations() {
+
+  // create random vector
+  std::vector<int> rand_vec;
+  const int vec_len = 3;
+  const int rand_max = 8;
+  for (int i = 0; i < vec_len; ++i) {
+    rand_vec.emplace_back(rand() % rand_max);
+  }
+  
+  // print
+  PrintVector(&rand_vec);
+  
+  // Compute permutations
+  std::vector<std::vector<int>> list_permutations;
+  ComputePermutations(&rand_vec, 0, &list_permutations);
+
+  // print permutations
+  for (int i = 0; i < list_permutations.size(); ++i) {
+    std::vector<int>& perm = list_permutations.at(i);
+    std::cout << i << ": ";
+    std::for_each(perm.begin(), perm.end(), [](const int&vec_elem) {
+      std::cout << vec_elem << ", ";
+    });
+    std::cout << std::endl;
+  }
 
   return;
 }
@@ -887,7 +965,7 @@ void ApplyPermutationInplace(std::vector<int>* vec_ptr, std::vector<int>* perm_p
       int i_target = perm.at(i_from);
       int cache_target = vec.at(i_target); // save the overwritten value
       vec.at(i_target) = val_at_i_from;
-      perm.at(i_from) *= -1;
+      perm.at(i_from) -= perm.size();  // *-1 does not work for 0 !
       // prepare for next round            
       i_from = i_target;
       val_at_i_from = cache_target;
@@ -970,12 +1048,12 @@ void ApplyPermutationExtraSpace(std::vector<int>* vec_ptr, std::vector<int>* per
 void FindNextPermutation(std::vector<int>* vec_ptr) {
   std::vector<int>& vec = *vec_ptr;
   int i = - 1;
-  for (i = (int)vec.size() - 1; i > 0; --i) {    
+  for (i = (int)vec.size() - 1; i > 0; --i) {      // step 1: find a decrease from right-to-left
     if (vec.at(i - 1) < vec.at(i)) break;
   }
   if (i > 0) {
     int j = -1;
-    for (j = (int)vec.size() - 1; j > 0; --j) {
+    for (j = (int)vec.size() - 1; j > 0; --j) {   // step 2: find rightmost larger element
       if (vec.at(j) > vec.at(i - 1)) break;
     }
     SwapInt(&vec.at(i - 1), &vec.at(j));
@@ -1008,6 +1086,21 @@ void FindNextPermutation_FirstTry(std::vector<int>* vec_ptr) {
   }
   return;
 }
+
+
+/*
+  Idea:  simply make k calls to the random number generator, that
+  should return of the unpicked elements at equal probability.
+*/
+void RearrangeRandomSubarrayAtFront(std::vector<int>* vec_ptr, const int k) {
+  std::vector<int>& vec = *vec_ptr;
+  for (int i = 0; i < k; ++i) {
+    const int i_pick_random = rand() % (vec.size() - i) + i;
+    SwapInt(&vec.at(i), &vec.at(i_pick_random));
+  }
+  return;
+}
+
 
 /*
   Incrementing a number is easy. The only caveat is to mind the
@@ -1474,6 +1567,39 @@ std::vector<int> ComputePrimes(const int n) {
   return primes_found;
 }
 
+/*
+  Idea:
+
+  compute permutations recursively by actually doing each permutation.
+  
+  start with the vector as it is. then start to do permutations from the
+  back, always reverting the permutation after all permutaitons of the
+  following elements have been considered. 
+  
+  note: re_use the given vector to permute in place
+
+  complexity:   n + n * ( (n-1) + (n-1) * ( (n-2) + (n-2) * (...) ) )
+          = n * (1 +    ( (n-1) + (n-1) * ( (n-2) + (n-2) * (...) ) )
+          ~ O(n * n!)
+
+*/
+void ComputePermutations(std::vector<int>* vec_ptr, const int i0, 
+  std::vector<std::vector<int>>* permutations_ptr) {
+
+  std::vector<int>& vec = *vec_ptr;
+
+  if (i0 == (int)vec.size() - 1) {  // reached last element
+    permutations_ptr->emplace_back(vec);
+    return;
+  }
+  for (int i = i0; i < (int)vec.size(); ++i) {
+    SwapInt(&vec.at(i0), &vec.at(i));
+    ComputePermutations(vec_ptr, i0 + 1, permutations_ptr);
+    SwapInt(&vec.at(i), &vec.at(i0));
+  }  
+
+  return;
+}
 
 /*
   Standard Swap 
