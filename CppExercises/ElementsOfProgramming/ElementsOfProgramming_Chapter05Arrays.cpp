@@ -6,6 +6,7 @@
 #include <iostream>
 #include <time.h>
 #include <vector>
+#include <unordered_set>
 #include <algorithm>
 
 
@@ -99,7 +100,7 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: Multiplication of two digit arrays" << std::endl;
   std::cout << "------------------------------" << std::endl;
-  ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays();
+  ElementsOfProgrammingChapter05Arrays_MultiplicationDigitArrays();  
 
   //-------------------------------------------- OTHER ARRAY EXERCISES
   
@@ -131,8 +132,27 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: Compute Permutations" << std::endl;
   std::cout << "------------------------------" << std::endl;
-  ElementsOfProgrammingChapter05Arrays_ComputePermutations();
+  ElementsOfProgrammingChapter05Arrays_ComputePermutations();  
+
+  //-------------------------------------------- MULTIDIMENSIONAL ARRAY EXERCISES
+
+  //--------- Exercise: Check Partly Filled Soduko
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Check Partly Filled Sudoku" << std::endl;
+  std::cout << "------------------------------" << std::endl;  
+  ElementsOfProgrammingChapter05Arrays_CheckPartlyFilledSudoku();
   
+  //--------- Exercise: Get sequence in spiral order
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Get sequence in spiral order" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_GetSequenceInSpiralOrder();
+  
+  //--------- Exercise: Rotate 90° around central point 
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Rotate 90° around central point" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_Rotate90AroundCentralPoint();
   
   return;
 
@@ -583,7 +603,7 @@ void ElementsOfProgrammingChapter05Arrays_ComputePermutations() {
   ComputePermutations(&rand_vec, 0, &list_permutations);
 
   // print permutations
-  for (int i = 0; i < list_permutations.size(); ++i) {
+  for (int i = 0; i < (int)list_permutations.size(); ++i) {
     std::vector<int>& perm = list_permutations.at(i);
     std::cout << i << ": ";
     std::for_each(perm.begin(), perm.end(), [](const int&vec_elem) {
@@ -591,6 +611,132 @@ void ElementsOfProgrammingChapter05Arrays_ComputePermutations() {
     });
     std::cout << std::endl;
   }
+
+  return;
+}
+
+/*
+  Exercise description: 
+
+  given a partly filled Sudoku, i.e. a 9x9 array with most entries
+  unfilled (0's) and a few entries filled with a number in [1,..,9],
+  check if the filling is correct or not. A filling is correct
+  if a number appears only once in each row, column, and 3x3 subgrid.
+*/
+void ElementsOfProgrammingChapter05Arrays_CheckPartlyFilledSudoku() {
+
+  // produce partly filled sudoku
+  const int n = 9;
+  const int max_val = 9;
+  std::vector<std::vector<int>> grid(n, std::vector<int>(n, 0));
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      const int rand_num = rand() % (8*max_val) + 1; // P(9<=k<=1) = 8/72, P(0) = 66/72, 
+      if (rand_num <= max_val) {
+        grid[i][j] = rand_num;
+      }
+      else {
+        grid[i][j] = 0;
+      }
+    }
+  }
+
+  // print sudoku
+  std::cout << "Check following prefilled Sudoku:" << std::endl;
+  for (int i = 0; i < n; ++i) {
+    std::cout << " ";
+    for (int j = 0; j < n; ++j) {
+      std::cout << grid[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  // check
+  bool filling_ok = IsCorrectPrefilledSudokuBruteForce(&grid);
+
+  // print answer
+  if (filling_ok) {
+    std::cout << "Yes, sudoku is filled correct so far." << std::endl;
+  }
+  else {
+    std::cout << "No, sudoku is filled wrong." << std::endl;
+  }
+  std::cout << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description: 
+
+  Given a 2d array of size nxn, write the elements in a 1d array of size
+  n*n, and order them according to the spiral ordering.
+  
+ */
+void ElementsOfProgrammingChapter05Arrays_GetSequenceInSpiralOrder() {
+
+  // produce random filled 2d nxn matrix
+  const int n = 9;
+  const int max_val = 9;
+  std::vector<std::vector<int>> grid(n, std::vector<int>(n, 0));
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      const int rand_num = rand() % max_val;
+        grid[i][j] = rand_num;
+    }
+  }
+  
+  // print matrix
+  Print2dMatrix(&grid);
+
+  // compute spiral order
+  std::vector<int> spiral_order = GetSequenceInSpiralOrder(&grid);
+
+  // print answer
+  std::cout << "Matrix as sequence in spiral order:" << std::endl;
+  for (int k = 0; k < (int)spiral_order.size(); ++k) {
+    std::cout << spiral_order.at(k) << ", ";
+  }
+  std::cout << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  given an nxn matrix, there is always a central point. Rotate the
+  entries around the central point by 90° clockwise.
+
+  E.g.   123      741
+         456  ->  852
+         789      963
+
+  
+*/
+void ElementsOfProgrammingChapter05Arrays_Rotate90AroundCentralPoint() {
+
+  // produce random filled 2d nxn matrix
+  const int n = 5;
+  const int max_val = 9;
+  std::vector<std::vector<int>> grid(n, std::vector<int>(n, 0));
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      const int rand_num = rand() % max_val;
+      grid[i][j] = rand_num;
+    }
+  }
+
+  // print matrix
+  Print2dMatrix(&grid);
+  
+  // compute spiral order
+  // RotateMatrixBy90_ExtraSpace(&grid);
+  RotateMatrixBy90(&grid);
+
+  // print matrix
+  Print2dMatrix(&grid);
 
   return;
 }
@@ -1017,7 +1163,7 @@ void ApplyPermutationExtraSpace(std::vector<int>* vec_ptr, std::vector<int>* per
   std::vector<int>& vec = *vec_ptr;
   std::vector<int>& perm = *perm_ptr;
   std::vector<int> new_vec(vec.size(), 0);
-  for (int i = 0; i < perm.size(); ++i) {
+  for (int i = 0; i < (int)perm.size(); ++i) {
     new_vec.at(perm.at(i)) = vec.at(i);
   }
   vec = new_vec;
@@ -1511,7 +1657,7 @@ void RemoveDuplicatesFromSortedVector(std::vector<int>* vec_ptr) {
 
 void RemoveDuplicatesFromSortedVector_textbook(std::vector<int>* vec_ptr) {
   std::vector<int>& vec = *vec_ptr;
-  int write_index = 1;
+  size_t write_index = 1;
   for (size_t i = 1; i < vec.size(); ++i) {
     if (vec.at(i) != vec.at(write_index - 1)) {
       vec.at(write_index++) = vec.at(i);
@@ -1601,6 +1747,331 @@ void ComputePermutations(std::vector<int>* vec_ptr, const int i0,
   return;
 }
 
+
+/*
+  idea: check all rows, cols, subgrids.
+    
+*/
+bool IsCorrectPrefilledSudokuBruteForce(const std::vector<std::vector<int>>* grid_ptr) {
+  const std::vector<std::vector<int>>& grid = *grid_ptr;
+  // check rows
+  for (int i = 0; i < (int)grid.size(); ++i) {
+    if (RegionHasDuplicate(grid_ptr, i, i + 1, 0, grid.at(i).size())) {
+      std::cout << "Row " << i << " is wrong." << std::endl;
+      return false;
+    }
+  }
+  // check columns
+  for (int j = 0; j < (int)grid.size(); ++j) {
+    if (RegionHasDuplicate(grid_ptr, 0, grid.size(), j, j + 1)) {
+      std::cout << "Column " << j << " is wrong." << std::endl;
+      return false;
+    }
+  }
+  // check subgrids
+  const int n_subgrids = (int)sqrt(grid.size());
+  const int subgrid_size = n_subgrids;
+  for (int i = 0; i < n_subgrids; ++i) {
+    for (int j = 0; j < n_subgrids; ++j) {
+      if (RegionHasDuplicate(grid_ptr, i * subgrid_size, (i + 1) * subgrid_size,
+        j * subgrid_size, (j + 1) * subgrid_size)) {
+        std::cout << "subgrid with topleft (" << i * 3 << ", " << j * 3  << ") is wrong." << std::endl;
+        return false;
+      }
+    }
+  }
+  // once all checks were passed, we know the grid is fine
+  return true;
+}
+
+/*
+  helper function: check if a region contains duplicates
+
+  note: i0, j0 are first indices of region, iend, jend are one beyond last elements
+*/
+bool RegionHasDuplicate(const std::vector<std::vector<int>>* grid_ptr,
+  const int i0, const int iend, const int j0, const int jend) {
+  const std::vector<std::vector<int>>& grid = *grid_ptr;
+  std::vector<bool> found_before(grid.size() + 1, false); // +1 to have from 0 to 9
+  for (int i = i0; i < iend; ++i) {
+    for (int j = j0; j < jend; ++j) {
+      const int val = grid.at(i).at(j);
+      if (val != 0 && found_before.at(val)) {
+        return true;
+      }
+      found_before.at(val) = true;
+    }
+  }
+  return false;
+}
+
+/*
+  first try: stupid version of the brute-force method ...
+
+  check each of the 27 entries. if 0 continue. if not, check
+    i) row is fine
+    ii) column is fine
+    iii) subgrid is fine
+
+  --> inefficient: it is enough to check each row, column, subgrid once !
+*/
+bool IsCorrectPrefilledSudokuBruteForce_FirstTry(const std::vector<std::vector<int>>* grid_ptr) {
+  const std::vector<std::vector<int>>& grid = *grid_ptr;
+
+  // debug: error checks
+  const int sudoku_size = 9;
+  if (grid.size() != sudoku_size) {
+    // error.. expecting a sudoku grid
+    std::cout << "Error. Should not reach here. " << std::endl;
+    return false;
+  }
+  else {
+    for (int i = 0; i < sudoku_size; ++i) {
+      const std::vector<int>& column = grid.at(i);
+      if (column.size() != sudoku_size) {
+        // error
+        int i = &column - &(grid.at(0));
+        std::cout << "Error: Column " << i << "contains !=" << sudoku_size << "entries" << std::endl;
+        return false;
+      }
+    }
+  }
+
+  // brute force check
+  std::unordered_set<int> other_vals;
+  bool duplicate_found = false;
+  for (int i = 0; i < sudoku_size; ++i) {
+    for (int j = 0; j < sudoku_size; ++j) {
+      int val = grid.at(i).at(j);
+      if (val == 0) {
+        continue;
+      }
+      else {
+        // check row
+        for (int k = 0; k < sudoku_size; ++k) {
+          if (j == k) {
+            continue;
+          }
+          else {
+            if (grid.at(i).at(k) != 0) {
+              other_vals.emplace(grid.at(i).at(k));
+            }
+          }
+          if (other_vals.find(val) != other_vals.end()) {
+            // duplicate found
+            duplicate_found = true;
+          }
+        }
+        other_vals.clear();
+        // check column
+        for (int k = 0; k < sudoku_size; ++k) {
+          if (i == k) {
+            continue;
+          }
+          else {
+            if (grid.at(k).at(j) != 0) {
+              other_vals.emplace(grid.at(k).at(j));
+            }
+          }
+          if (other_vals.find(val) != other_vals.end()) {
+            // duplicate found
+            duplicate_found = true;
+          }
+        }
+        other_vals.clear();
+        // check subgrid
+        std::pair<int, int> top_left = { (i / 3) * 3, (j / 3) * 3 };
+        for (int k = 0; k < 3; ++k) {
+          for (int l = 0; l < 3; ++l) {
+            if (top_left.first + k == i && top_left.second + l == j) {
+              continue;
+            }
+            else {
+              if (grid.at(top_left.first + k).at(top_left.second + l) != 0) {
+                other_vals.emplace(grid.at(top_left.first + k).at(top_left.second + l));
+              }              
+            }
+          }
+        }
+        if (other_vals.find(val) != other_vals.end()) {
+          // duplicate found
+          duplicate_found = true;
+        }
+        other_vals.clear();
+      }      
+    }
+  }
+
+  return !duplicate_found;
+}
+
+/*
+  idea: 
+
+  we try to follow the spiral movement! 
+
+  convention: 
+                c = 0    |  c = 1  |  ... | c = n - 1 
+  r = 0          x_0,0      x_0,1     ...    x_0,n-1
+  r = 1          x_1,0      x_1,1     ...    x_1,n-1
+  ..
+  r = n-1        x_n-1,0    x_n-1,1   ...    x_n-1,n-1
+
+
+  so: "top" means row = 0, "bottom" row = n-1
+      "left" means col = 0, "right" col = n-1
+
+
+  Every time we complete a row or a column the confining indices
+  have to compressed, e.g. start with 0th row, after that 
+  the minimum row-index for remaining rounds is 1.
+
+  Move1: going left-right through row and at the end top-bottom.
+  Move2: going right-left through row and at the end bottom-top.
+  
+  Iteratively shrink the boundaries and switch between the two
+  movements.
+
+  Note: i0, j0 are first elements, iend, jend are one beyond last element
+
+*/
+std::vector<int> GetSequenceInSpiralOrder(const std::vector<std::vector<int>>* grid_ptr) {
+  const std::vector<std::vector<int>>& grid = *grid_ptr;
+  std::vector<int> sequence;
+
+  int counter = 0;
+  int step = 1;
+  int i0 = 0, iend = grid.size(), j0 = 0, jend = grid.size();
+  int i = i0;
+  int j = j0;
+  while (counter < (int)(grid.size() * grid.size()) - 1) {
+    // horizontal moves
+    while (j >= j0 && j < jend) {
+      sequence.emplace_back(grid.at(i).at(j));
+      ++counter;
+      j += step;
+    }
+    j -= step; // one step back to be on the grid again
+    if (step == 1) { // we have been running left to right (at top)
+      i0 += 1;
+      i += 1;
+    }
+    else { // we have been running right to left (at the bottom)
+      iend -= 1;
+      i -= 1;
+    }
+    // vertical moves
+    while (i >= i0 && i < iend) {
+      sequence.emplace_back(grid.at(i).at(j));
+      ++counter;
+      i += step;
+    }
+    i -= step; // one step back to be on the grid again
+    if (step == 1) { // we have been running top to bottom (at right)
+      jend -= 1;
+      j -= 1;
+    }
+    else { // we have been running bottom to top (at left)
+      j0 += 1;
+      j += 1;
+    }
+    // every other round we need to change direction
+    step *= -1; 
+  }
+
+  return sequence;
+}
+
+/*
+  idea:
+  
+  for rotation of a nxn matrix, 
+  a key insight is that every ring of entries around the center
+  can be rotated independently from the other rings   
+
+  E.g.   1234      D951
+         5678  ->  E  2  +  A6
+         9ABC      F  3     B7
+         DEFG      GC84
+
+  To rotate one ring, we need make 4 shifts of its sides:
+
+    1. top-side     -> right-side
+    2. right-side   -> bottom-side
+    3. bottome-side -> left-side
+    4. left-side    -> top-side
+
+  The entries of a ring's side are determined by the distance
+  to the center. We make the convention that the
+  innermost ring has distance 0. 
+  if n=even, entries per side are (distance+1)*2
+  if n=odd,  entries per side are (distance+1)*2 + 1
+
+   -> time complexity O(n*n)
+      space complexity O(n*n)
+*/
+void RotateMatrixBy90_ExtraSpace(std::vector<std::vector<int>>* grid_ptr) {
+  std::vector<std::vector<int>>& grid = *grid_ptr;
+  std::vector<std::vector<int>> grid_copy = *grid_ptr;
+  const int n = grid.size();
+  const int max_distance_center = n / 2 - 1;  // for n=2, 3: 0, for n=4,5: 1, for n=6,7: 2
+  int distance_center = max_distance_center;
+  int i0 = 0;
+  int j0 = 0;
+  while (distance_center >= 0) {
+    int n_side = (distance_center + 1) * 2;
+    if (n % 2) n_side += 1;    
+    for (int k = 0; k < n_side; ++k) {      
+      grid[i0 + k][j0 + n_side - 1] = grid_copy[i0][j0 + k];  // 1.
+      grid[i0 + n_side - 1][j0 + n_side - 1 - k] = grid_copy[i0 + k][j0 + n_side - 1];  // 2.
+      grid[i0 + n_side - 1 - k][j0] = grid_copy[i0 + n_side - 1][j0 + n_side - 1 - k]; // 3.
+      grid[i0][j0 + k] = grid_copy[i0 + n_side - 1 - k][j0]; // 4.
+    }    
+    // go to next ring towards center
+    --distance_center;
+    i0 += 1;
+    j0 += 1;
+  }
+  return;
+}
+
+/*
+  idea:
+
+  one can save the additional storage by using temporary variables. however,
+  if we need to store the whole row/column that is moved, we still have O(n) storage.
+  
+  -> we can decrease the extra storage to O(1) by the a trick:
+
+    we do not rotate all elements, but only four at a time
+
+    (could also do one at a time, but it is hard to find a case distinction for
+    the correct indices)
+*/
+void RotateMatrixBy90(std::vector<std::vector<int>>* grid_ptr) {
+  std::vector<std::vector<int>>& grid = *grid_ptr;
+  const int n = (int)grid.size();
+  for (int layer = 0; layer < n / 2; ++layer) {
+    for (int k = layer; k < n - 1 - layer; ++k) {
+      const int temp_intoprow = grid.at(layer).at(k);
+      const int temp_inrgtcol = grid.at(k).at(n - 1 - layer);
+      const int temp_inbotrow = grid.at(n - 1 - layer).at(n - 1 - k);
+      const int temp_inlftrow = grid.at(n - 1 - k).at(layer);
+      // left-col -> top-row
+      grid.at(layer).at(k) = temp_inlftrow;
+      // top-row -> rght col
+      grid.at(k).at(n - 1 - layer) = temp_intoprow;
+      // rght-col -> bottom-row
+      grid.at(n - 1 - layer).at(n - 1 - k) = temp_inrgtcol;
+      // bottom-row -> left-col
+      grid.at(n - 1 - k).at(layer) = temp_inbotrow;      
+    }
+  }
+  return;
+}
+
+
+
 /*
   Standard Swap 
 */
@@ -1633,4 +2104,20 @@ void PrintVectorOfDigitsMSDat0(const std::vector<int>* vec_ptr) {
   }
   std::cout << std::endl;
 }
+
+void Print2dMatrix(const std::vector<std::vector<int>>* matrix_ptr) {
+  const int n = (int)matrix_ptr->size();
+  std::cout << "Work on following matrix" << std::endl;
+  for (int i = 0; i < n; ++i) {
+    std::cout << " ";
+    for (int j = 0; j < n; ++j) {
+      std::cout << (*matrix_ptr)[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+  return;
+}
+
+
 

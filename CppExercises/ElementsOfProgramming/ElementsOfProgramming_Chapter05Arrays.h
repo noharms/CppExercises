@@ -30,6 +30,10 @@ void ElementsOfProgrammingChapter05Arrays_RemoveDuplicatesFromSortedVec();
 void ElementsOfProgrammingChapter05Arrays_EnumeratePrimes();
 void ElementsOfProgrammingChapter05Arrays_ComputePermutations();
 
+void ElementsOfProgrammingChapter05Arrays_CheckPartlyFilledSudoku();
+void ElementsOfProgrammingChapter05Arrays_GetSequenceInSpiralOrder();
+void ElementsOfProgrammingChapter05Arrays_Rotate90AroundCentralPoint();
+
 
 void BubbleSort(std::vector<int>* vec_ptr);
 std::vector<int> MergeSort_FirstTry(const std::vector<int>& vec);
@@ -69,6 +73,15 @@ std::vector<int> ComputePrimes(const int n);
 void ComputePermutations(std::vector<int>* vec_ptr, const int i0,
   std::vector<std::vector<int>>* permutations_ptr);
 
+bool IsCorrectPrefilledSudokuBruteForce(const std::vector<std::vector<int>>* grid_ptr);
+bool RegionHasDuplicate(const std::vector<std::vector<int>>* grid_ptr,
+  const int i0, const int iend, const int j0, const int jend);
+bool IsCorrectPrefilledSudokuBruteForce_FirstTry(const std::vector<std::vector<int>>* grid_ptr);
+std::vector<int> GetSequenceInSpiralOrder(const std::vector<std::vector<int>>* grid_ptr);
+void RotateMatrixBy90_ExtraSpace(std::vector<std::vector<int>>* grid_ptr);
+void RotateMatrixBy90(std::vector<std::vector<int>>* grid_ptr);
+
 void SwapInt(int* a, int* b);
 void PrintVector(const std::vector<int>* vec_ptr);
 void PrintVectorOfDigitsMSDat0(const std::vector<int>* vec_ptr);
+void Print2dMatrix(const std::vector<std::vector<int>>* matrix_ptr);
