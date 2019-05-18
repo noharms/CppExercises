@@ -154,8 +154,13 @@ void ElementsOfProgrammingChapter05Arrays() {
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter05Arrays_Rotate90AroundCentralPoint();
   
-  return;
+  //--------- Exercise: Compute first n rows of Pascal triangle
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Compute first n rows of Pascal triangle" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter05Arrays_FirstRowsOfPascalTriangle();
 
+  return;
 }
 
 
@@ -737,6 +742,25 @@ void ElementsOfProgrammingChapter05Arrays_Rotate90AroundCentralPoint() {
 
   // print matrix
   Print2dMatrix(&grid);
+
+  return;
+}
+
+/*
+
+  Exercise description: 
+
+  compute the first n rows of Pascal's Triangle.
+
+*/
+void ElementsOfProgrammingChapter05Arrays_FirstRowsOfPascalTriangle() {
+  
+  // compute rows
+  const int max_row = 10;
+  std::vector<std::vector<int>> pascaltriangle = ComputePascalTriangle(max_row);
+
+  // print result
+  Print2dMatrix(&pascaltriangle);
 
   return;
 }
@@ -2070,7 +2094,49 @@ void RotateMatrixBy90(std::vector<std::vector<int>>* grid_ptr) {
   return;
 }
 
+/*
+  idea:  every single entry of Pacal's triangle is given by the formula
 
+    n over k = n! / (k! (n-k)!) 
+
+    if we were to compute only one entry, it would be easiest to simply
+    apply that formula, which would amout to an O(n) algorithm with O(1)
+    space.
+
+    However, since we are to compute all first n rows, and
+    in row n we have (n+1) entries, computing each
+    entry like that would amout to O(n*(n+1)*n).
+
+    -> a better way is to make use of the key insight that
+
+    P_n(i) = P_(n-1)(i) + P_(n-1)(i + 1) , i.e. all entries of a row
+    can be computed from the previous row
+
+                    1
+                  1   1
+              1     2    1
+          1     3      3    1
+      1      4      6    4     1
+       ....
+
+
+   -> O(n*(n+1))
+
+*/
+std::vector<std::vector<int>> ComputePascalTriangle(const int n) {
+  std::vector<std::vector<int>> pascaltriangle;
+  pascaltriangle.emplace_back(std::vector<int>(1, 1));  // row 0
+  pascaltriangle.emplace_back(std::vector<int>(2, 1));  // row 1
+  for (int i = 2; i < n; ++i) {
+    pascaltriangle.emplace_back(std::vector<int>(i + 1, 0)); // row i
+    pascaltriangle.at(i).at(0) = 1;
+    pascaltriangle.at(i).at(i) = 1;
+    for (int j = 1; j < i; ++j) {
+      pascaltriangle.at(i).at(j) = pascaltriangle.at(i - 1).at(j - 1) + pascaltriangle.at(i - 1).at(j);
+    }
+  }  
+  return pascaltriangle;
+}
 
 /*
   Standard Swap 
@@ -2110,7 +2176,8 @@ void Print2dMatrix(const std::vector<std::vector<int>>* matrix_ptr) {
   std::cout << "Work on following matrix" << std::endl;
   for (int i = 0; i < n; ++i) {
     std::cout << " ";
-    for (int j = 0; j < n; ++j) {
+    const int m = (*matrix_ptr)[i].size();
+    for (int j = 0; j < m; ++j) {
       std::cout << (*matrix_ptr)[i][j] << " ";
     }
     std::cout << std::endl;

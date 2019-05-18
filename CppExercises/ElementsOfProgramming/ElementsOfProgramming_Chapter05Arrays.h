@@ -33,6 +33,7 @@ void ElementsOfProgrammingChapter05Arrays_ComputePermutations();
 void ElementsOfProgrammingChapter05Arrays_CheckPartlyFilledSudoku();
 void ElementsOfProgrammingChapter05Arrays_GetSequenceInSpiralOrder();
 void ElementsOfProgrammingChapter05Arrays_Rotate90AroundCentralPoint();
+void ElementsOfProgrammingChapter05Arrays_FirstRowsOfPascalTriangle();
 
 
 void BubbleSort(std::vector<int>* vec_ptr);
@@ -80,6 +81,7 @@ bool IsCorrectPrefilledSudokuBruteForce_FirstTry(const std::vector<std::vector<i
 std::vector<int> GetSequenceInSpiralOrder(const std::vector<std::vector<int>>* grid_ptr);
 void RotateMatrixBy90_ExtraSpace(std::vector<std::vector<int>>* grid_ptr);
 void RotateMatrixBy90(std::vector<std::vector<int>>* grid_ptr);
+std::vector<std::vector<int>> ComputePascalTriangle(const int n);
 
 void SwapInt(int* a, int* b);
 void PrintVector(const std::vector<int>* vec_ptr);
