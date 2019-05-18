@@ -7,6 +7,7 @@
 
 #include "ElementsOfProgramming_Chapter04PrimitiveTypes.h"
 #include "ElementsOfProgramming_Chapter05Arrays.h"
+#include "ElementsOfProgramming_Chapter06Strings.h"
 #include "ElementsOfProgramming_Chapter18Graphs.h"
 
 
@@ -19,8 +20,12 @@ void MainElementsOfProgrammingExercises() {
   ElementsOfProgrammingChapter04PrimitiveTypes();*/
   
   //------------- Chapter 05: Arrays
-  std::cout << std::endl << "--- Chapter 05: Arrays" << std::endl;
-  ElementsOfProgrammingChapter05Arrays();
+  //std::cout << std::endl << "--- Chapter 05: Arrays" << std::endl;
+  //ElementsOfProgrammingChapter05Arrays();
+
+  //------------- Chapter 06: Arrays
+  std::cout << std::endl << "--- Chapter 06: Strings" << std::endl;
+  ElementsOfProgrammingChapter06Strings();
 
 	//------------- Chapter 18: Graphs
 	/*std::cout << std::endl << "--- Chapter 18: Graphs" << std::endl;
