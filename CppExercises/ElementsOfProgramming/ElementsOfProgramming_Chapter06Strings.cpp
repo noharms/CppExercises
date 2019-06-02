@@ -5,6 +5,8 @@
 #include "ElementsOfProgramming_Chapter06Strings.h"
 
 #include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 
 void ElementsOfProgrammingChapter06Strings() {
@@ -13,12 +15,18 @@ void ElementsOfProgrammingChapter06Strings() {
 
   //----------------------------------- 
 
-  //--------- Exercise: Check is palindrome
+  //--------- Exercise: Check is palindrome word
   std::cout << "------------------------------" << std::endl;
-  std::cout << "-- Exercise: Check is palindrome" << std::endl;
+  std::cout << "-- Exercise: Check is palindrome word" << std::endl;
   std::cout << "------------------------------" << std::endl;
-  ElementsOfProgrammingChapter06Strings_CheckIsPalindrome();  
-  
+  ElementsOfProgrammingChapter06Strings_CheckIsPalindromeWord();
+
+  //--------- Exercise: Check is palindrome text
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: Check is palindrome text" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_CheckIsPalindromeText();
+
   //--------- Exercise: String to int
   std::cout << "------------------------------" << std::endl;
   std::cout << "-- Exercise: String to int" << std::endl;
@@ -43,6 +51,30 @@ void ElementsOfProgrammingChapter06Strings() {
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter06Strings_OrderingNumberOfSpreadsheetColumn();
 
+  //--------- Exercise: Remove and replace letters of string
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: RemoveAndReplaceLettersOfString" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_RemoveAndReplaceLettersOfStringInPlace();
+  
+  //--------- Exercise: Reverse order of words in text
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: ReverseOrderOfWordsInText" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_ReverseOrderOfWordsInTextInPlace();
+  
+  //--------- Exercise: Mnemonics of phone number
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: MnemonicsOfPhoneNumber" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_MnemonicsOfPhoneNumber();
+  
+  //--------- Exercise: LookAndSaySequence
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: LookAndSaySequence" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_LookAndSaySequence();
+
   return;
 }
 
@@ -58,17 +90,38 @@ void ElementsOfProgrammingChapter06Strings() {
 /*
   Exercise description:
 
-  given a string, check if it is palindromic.
+  given a word, check if it is palindromic.
 */
-void ElementsOfProgrammingChapter06Strings_CheckIsPalindrome() {
+void ElementsOfProgrammingChapter06Strings_CheckIsPalindromeWord() {
 
   // create two strings
   std::string str1 = "anna";
   std::string str2 = "amna";
 
   // make the check
-  std::cout << "String " << str1 << " is " << (CheckIsPalindrome(str1) ? "" : "not ") << "palindromic" << std::endl;
-  std::cout << "String " << str2 << " is " << (CheckIsPalindrome(str2) ? "" : "not ") << "palindromic" << std::endl;
+  std::cout << "String \"" << str1 << "\" is " << (CheckIsPalindromeWord(str1) ? "" : "not ") << "palindromic" << std::endl;
+  std::cout << "String \"" << str2 << "\" is " << (CheckIsPalindromeWord(str2) ? "" : "not ") << "palindromic" << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  given a string, check if it is palindromic:
+  
+    considering only the alphanumeric letters, i.e. a-z, A-Z, 0-9
+    ignoreing case
+*/
+void ElementsOfProgrammingChapter06Strings_CheckIsPalindromeText() {
+  
+  // create two strings
+  std::string str1 = "Able was I, ere I saw Elba!";
+  std::string str2 = "Ray is Ray";
+
+  // make the check
+  std::cout << "String \"" << str1 << "\" is " << (CheckIsPalindromeText(str1) ? "" : "not ") << "palindromic" << std::endl;
+  std::cout << "String \"" << str2 << "\" is " << (CheckIsPalindromeText(str2) ? "" : "not ") << "palindromic" << std::endl;
 
   return;
 }
@@ -173,6 +226,121 @@ void ElementsOfProgrammingChapter06Strings_OrderingNumberOfSpreadsheetColumn() {
   return;
 }
 
+/*
+  Exercise description:
+
+  Given a string, apply two rules to modify the string
+
+    - remove all b's
+    - replace all a's by dd
+
+  Work in-place on the incoming string and assume that it has enough extra space if it gets longer.
+
+*/
+void ElementsOfProgrammingChapter06Strings_RemoveAndReplaceLettersOfStringInPlace() {
+  
+  // setting
+  std::string test_str = "dcbaabcdaa";
+  const int relevant_letters = test_str.size();
+  test_str.resize(relevant_letters + 2);  // to provide enough space
+  std::cout << "String example:" << std::endl;
+  std::cout << test_str << std::endl;
+
+  // apply the modifications in place
+  RemoveAndReplaceLettersInPlace(&test_str, relevant_letters);
+
+  // print result
+  std::cout << "After modification:" << std::endl;
+  std::cout << test_str << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  Given a text containing of words and white spaces, reverse the order of the words.
+  Work in place.
+
+*/
+void ElementsOfProgrammingChapter06Strings_ReverseOrderOfWordsInTextInPlace() {
+
+  // setting
+  std::string test_text = "This is the story";
+  std::cout << "Text example:" << std::endl;
+  std::cout << test_text << std::endl;
+
+  // Reverse order
+  ReverseOrderOfWordsInTextInPlace(&test_text);
+
+  // print result
+  std::cout << "Reversed order:" << std::endl;
+  std::cout << test_text << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  Given a string of digits (e.g. a phone number), find all 
+  mnemomics that this sequence of digits can represent    
+
+*/
+void ElementsOfProgrammingChapter06Strings_MnemonicsOfPhoneNumber() {
+
+  // setting 
+  //std::string phone_number = "+61424144024";
+  //std::string phone_number = "144024";
+  std::string phone_number = "7587";
+
+  // Find Mnemonics
+  std::vector<std::string> list_mnemonics;
+  FindMnemonicsOfPhonenumber_Recursion(&list_mnemonics, phone_number, "");
+
+  // print all found results
+  std::cout << "Found mnemonics: " << list_mnemonics.size() << std::endl;
+  for (std::string mnemonic : list_mnemonics) {
+    std::cout << mnemonic << std::endl;
+  }
+  std::cout << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  the look-and-say sequence starts with the integer 1.
+  the next element is obtained by going through the digits of
+  the old element and replacing all consecutive sequences of equal
+  digits by the count and the digit. This is how many people
+  would read out the sequence - thus the name 'look and say'.
+
+  1
+  11
+  21
+  1211
+  111221
+  312211
+  13112221
+  ..
+*/
+void ElementsOfProgrammingChapter06Strings_LookAndSaySequence() {
+
+  // setting
+  const int n = 7;
+
+  // compute the nth element
+  std::string nth_element = FindNthElementOfLookAndSaySequence(n);
+
+  // print the result
+  std::cout << "The " << n << "th element of the sequence is:" << std::endl;
+  std::cout << nth_element << std::endl;
+
+  return;
+}
+
 /**
  *----------------------------------------------------------------------------------------------
  *----------------------------------------------------------------------------------------------
@@ -186,7 +354,7 @@ void ElementsOfProgrammingChapter06Strings_OrderingNumberOfSpreadsheetColumn() {
   -> O(n)
 
 */
-bool CheckIsPalindrome(std::string str) {
+bool CheckIsPalindromeWord(std::string str) {
   for (int i = 0, j = str.size() - 1; i < j; ++i, --j) {
     if (str[i] != str[j]) {
       return false;
@@ -194,6 +362,32 @@ bool CheckIsPalindrome(std::string str) {
   }
   return true;
 }
+
+
+/*
+  idea: go from both ends to compare the characters that should be equal
+
+    - skip all letters that are not alphanumeric
+    - neglect case sensitivity
+
+  -> O(n)
+
+*/
+bool CheckIsPalindromeText(std::string str) {
+  for (int i = 0, j = str.size() - 1; i < j; ++i, --j) {
+    while (i < j && !isalnum(str.at(i))) { ++i; };
+    while (i < j && !isalnum(str.at(j))) { --j; };
+    if (i < j) {
+      const char left = isdigit(str.at(i)) ? str.at(i) : tolower(str.at(i));
+      const char rght = isdigit(str.at(j)) ? str.at(j) : tolower(str.at(j));
+      if (left != rght) {
+        return false;
+      }
+    }    
+  }
+  return true;
+}
+
 
 /*
   idea:  in ascii table digits come in a sequence and chars
@@ -349,4 +543,213 @@ int OrderingNumberOfColumnName(std::string colname) {
     ordering_num += colname[i] - 'A' + 1;
   }
   return ordering_num;
+}
+
+
+/*
+  Two Rules:
+
+    - remove b's
+    - replace a's by dd
+
+  Idea: 
+
+    This would be very simply doable in O(n) time, if we could use additional O(n) space.
+    If we work in place, however, one needs a clever way to preserver the O(n) complexity.
+
+    The key idea is to do multiple traversals. In the first traversal count how long the
+    resulting string will be. In the second traversal, start at the end of the
+    relevant letters in the input string and write to the end of the resulting string.
+
+    a) If no a's and b's are present this will obviously work.
+    b) If only a's are present, the hardest case is that the input string offers exactly
+    as many space as will be needed after replacing a's with double d's. In that case
+    the writing from the right will be faster than the reading, but by construction
+    it is guaranteed that it can never overtake the reading. If it reaches the reading
+    we know that no more a's can occur because we determined the length
+    of the resulting string.
+    c) If a's and b's are present, the rationale of b) comes to a problem. The writing 
+    could overtake the reading if there are still some b's to come. To avoid this
+    we have to do a writing that removes the b's first and then follow the logic of b).
+
+*/
+void RemoveAndReplaceLettersInPlace(std::string* str_ptr, const int n_relevant_letters) {
+
+  std::string& str = *str_ptr;
+
+  // 1. remove b's (going left to right), also count a's and b's
+  int count_a = 0;
+  int count_b = 0;
+  for (int read_i = 0, write_i = 0; read_i < n_relevant_letters; ++read_i) {
+    const char c = str.at(read_i);    
+    if (c != 'b') {
+      str.at(write_i++) = str.at(read_i);
+      if (c == 'a') {
+        ++count_a;
+      }
+    }
+    else { // b's are not written
+      ++count_b;
+    }
+  }
+  int len_no_bs = n_relevant_letters - count_b;
+  int len_result = len_no_bs + count_a;
+
+  // 2. replace a's
+  for (int read_i = len_no_bs - 1, write_i = len_result - 1; read_i >= 0; --read_i) {
+    const char c = str.at(read_i);
+    if (c == 'a') {
+      str.at(write_i--) = 'd';
+      str.at(write_i--) = 'd';
+    }
+    else {
+      str.at(write_i--) = c;
+    }
+  }
+
+  return;
+}
+
+/*
+  idea: 
+
+  using O(n) additional space, it would be easy to copy the words
+  from the input to the output string in reverse order in O(n) time.
+
+  using O(1) space, the key insight for an O(n) time algorithm is
+  that we do two reversals:
+
+    1. reverse all letters of the whole string, O(n)
+    2. go through, identifying words by blank space delimitors, and
+    reverse the words, O(2 *n)
+
+    --> O(n) time, O(1) space
+*/
+void ReverseOrderOfWordsInTextInPlace(std::string* str_ptr) {
+
+  std::string& str = *str_ptr;
+
+  // reverse the string
+  std::reverse(str.begin(), str.end());
+
+  // go through to identify words and reverse te words
+  for (std::string::iterator it = str.begin(), blank_it = it; it < str.end(); ) {
+    while (blank_it < str.end() && *blank_it != ' ') {
+      ++blank_it;
+    }
+    // now word_i is either at the next blank space, or beyond the size of the string    
+    std::reverse(it, blank_it);
+    if (blank_it < str.end()) {
+      ++blank_it; // move to next letter or past-the-end iterator
+    }
+    it = blank_it;;
+  }
+
+  return;
+}
+
+
+/*
+  Idea: 
+
+  Use recursion
+    
+  Note: 0 and 1 remain as they are.
+  Note: all non-digit chars remain as they are
+
+  -> this will maximally give 4^n mnemomics , where n is the length of the digit_sequence
+
+  -> space O(4^n)
+  -> time O(4^n * n) because each base case does an O(n) operation
+
+*/
+void FindMnemonicsOfPhonenumber_Recursion(std::vector<std::string>* list_mnemonics_ptr, 
+  const std::string digit_sequence,
+  std::string curr_mnemonic
+  ) {  
+  std::vector<std::string>& list_mnemonics = *list_mnemonics_ptr;
+
+  if (digit_sequence.empty()) {
+    list_mnemonics.emplace_back(curr_mnemonic); // O(n): making copy of the resulting mnemonic
+    return;
+  }
+
+  const std::unordered_map<char, std::unordered_set<char>> keypad = {
+    {'2', {'A', 'B', 'C'}},
+    {'3', {'D', 'E', 'F'}},
+    {'4', {'G', 'H', 'I'}},
+    {'5', {'J', 'K', 'L'}},
+    {'6', {'M', 'N', 'O'}},
+    {'7', {'P', 'Q', 'R', 'S'}},
+    {'8', {'T', 'U', 'V'}},
+    {'9', {'W', 'X', 'Y', 'Z'}}  
+  };
+
+  // go through all possibilites
+  const char current_char = digit_sequence.at(0);
+  std::unordered_set<char> possible_vals;
+  if (keypad.find(current_char) != keypad.end()) {  // if char is a digit of keypad
+    possible_vals = keypad.at(current_char);
+  }
+  else { // otherwise the only possible value is the char itsself
+    //possible_vals.emplace(current_char);
+    FindMnemonicsOfPhonenumber_Recursion(list_mnemonics_ptr,
+      digit_sequence.substr(1, digit_sequence.size() - 1),
+      curr_mnemonic);
+  }
+  for (char c : possible_vals) {
+    curr_mnemonic.push_back(c);
+    FindMnemonicsOfPhonenumber_Recursion(list_mnemonics_ptr, 
+      digit_sequence.substr(1, digit_sequence.size() - 1), 
+      curr_mnemonic);
+    curr_mnemonic.pop_back();
+  }
+
+  return;
+}
+
+
+/*
+  idea:
+
+  we need to compute the nth element by computing each element
+  of the sequence iteratively from the previous one.
+
+  we have n iterations.
+  in each iteration the element can have at most twice the number
+  of digits as before (if no two consecutive digits are the same),
+  therefore with each iteration we maximally double the digits.
+  -> at the end we have an upper bound for the digits of 2^n
+
+
+  -> the time complexity is bound by O(n * 2^n)
+
+  -> space complexity is bound by O(2^n)
+  
+ */
+std::string FindNthElementOfLookAndSaySequence(const int n) {
+  std::string curr_element = "11";
+  for (int i = 3; i <= n; ++i) {
+    std::string next_element;
+    int count = 1;
+    for (int k = 0; k < (int)curr_element.size() - 1; ++k) {
+      const char c = curr_element.at(k);
+      if (curr_element.at(k + 1) == c) {
+        ++count;        
+      }
+      else {
+        next_element += std::to_string(count);
+        next_element += c;        
+        count = 1;
+      }
+      // since we check the next element the last element itself has to be handled
+      if (k == curr_element.size() - 2) {
+        next_element += std::to_string(count); // count was already raised or set to 1
+        next_element += curr_element.at(k + 1);
+      }
+    }
+    // now we have found the new element
+    curr_element = next_element;
+  }
+  return curr_element;
 }
