@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
+#include <map>
 
 
 void ElementsOfProgrammingChapter06Strings() {
@@ -74,6 +75,24 @@ void ElementsOfProgrammingChapter06Strings() {
   std::cout << "-- Exercise: LookAndSaySequence" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter06Strings_LookAndSaySequence();
+
+  //--------- Exercise: RomanNumberStringToInteger
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: RomanNumberStringToInteger" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_RomanNumberStringToInteger();
+
+  //--------- Exercise: IntegerToShortestRomanNumberString
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: IntegerToShortestRomanNumberString" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_IntegerToShortestRomanNumberString();
+  
+  //--------- Exercise: MakeIPadressesFromNumber
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: MakeIPadressesFromNumber" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_MakeIPadressesFromNumber();
 
   return;
 }
@@ -340,6 +359,89 @@ void ElementsOfProgrammingChapter06Strings_LookAndSaySequence() {
 
   return;
 }
+
+/*
+  Exercise description:
+
+  given a string that represents a Roman number, convert it to an integer.
+
+  a Roman number consists of the letters 
+
+  I, V, X, L, C, D, M   = 1, 5, 10, 50, 100, 500, 1000
+
+  they have to appear in monotone descending order, with the exception that
+
+  IV, IX, XL, XC, CD, CM  may appear (but never togeter, e.g. not IXL)
+
+*/
+void ElementsOfProgrammingChapter06Strings_RomanNumberStringToInteger() {
+  
+  // setting
+  std::string romannumber_str = "MMMCDLXXXIV";
+
+  // compute the corresponding integer
+  int number = RomanNumberStringToInteger(&romannumber_str);
+
+  // print the result
+  std::cout << "The Roman number " << romannumber_str << " corresponds to:" << std::endl;
+  std::cout << number << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  given an integer, find the shortest roman number string of the same value
+
+  note: roman number strings are not unique !
+
+  e.g. 4 can be written as IIII and as IV.
+*/
+void ElementsOfProgrammingChapter06Strings_IntegerToShortestRomanNumberString() {
+
+  // setting
+  int number = 3484;
+
+  // compute the corresponding integer
+  std::string romannumber_str = IntegerToShortestRomanNumberString(number);
+
+  // print the result
+  std::cout << "The number " << number << " is shortest written in roman literals as:" << std::endl;
+  std::cout << romannumber_str << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description: 
+
+  given a string of a digit-sequence that was formerly an ip-adresses but lost its dots,
+  find all possible ip-adresses that this sequence could have been before.
+
+  Note: an ip adress is a 32-bit number, which is usually represented as
+        4 8-bit numbers separated by a dot. Each of the 4 8-bit numbers can
+        be in the range 0..255
+*/
+void ElementsOfProgrammingChapter06Strings_MakeIPadressesFromNumber() {
+
+  // setting
+  const std::string ipadress_withoutdots = "25525511";
+
+  // compute all possible ip-adresses
+  std::vector<std::string> list_ipadresses;
+  ComputePossibleIPadressesFromDigitSequence(ipadress_withoutdots, 4, &list_ipadresses);
+
+  // print the result
+  std::cout << "The digit sequence " << ipadress_withoutdots << " could be one of the following ip-adresses" << std::endl;
+  for (auto it = list_ipadresses.begin(); it != list_ipadresses.end(); ++it) {
+    std::cout << (*it) << std::endl;
+  }
+  std::cout << std::endl;
+
+  return;
+}
+
 
 /**
  *----------------------------------------------------------------------------------------------
@@ -752,4 +854,101 @@ std::string FindNthElementOfLookAndSaySequence(const int n) {
     curr_element = next_element;
   }
   return curr_element;
+}
+
+
+/*
+  idea: 
+
+  without the exceptions it would be super simple: just add up
+  the mapped value of the roman literals.
+
+  due to the possible exceptions, we have to add a check 
+  whether the new element is larger than the previous, in
+  which case a special handling is required
+*/
+int RomanNumberStringToInteger(const std::string* str_ptr) {
+  const std::string& str = *str_ptr;
+  int number = 0;
+  const std::unordered_map<char, int> roman2int = {
+    { 'I', 1},
+    { 'V', 5},
+    { 'X', 10},
+    { 'L', 50},
+    { 'C', 100},
+    { 'D', 500},
+    { 'M', 1000}
+  };
+  int val_prev = std::numeric_limits<int>::max();
+  for (char c : str) {
+    int val_curr = roman2int.at(c);
+    number += val_curr;
+    if (val_curr > val_prev) {
+      number -= 2 * val_prev;      
+    }
+    val_prev = val_curr;
+  }
+  return number;
+}
+
+/*
+  idea:
+
+  we need to iteratively check if the largest unchecked roman literal
+  fits again into the number. starting with M going down to I.
+
+  the restriction that we need to find the shortest representation means,
+  we have to use the exceptions CM, CD, XC, XL, IX, IV. so basically,
+  we just have to enhance the list of possible roman literals by
+  these exceptions in order to check after M = 1000 if CM = 900 is contained
+  instead of directly proceeding with D = 500.
+*/
+std::string IntegerToShortestRomanNumberString(int number) {
+
+  const std::vector<std::pair<int, std::string>> int2romanliterals = {
+    { 1000, "M"},
+    {  900, "CM"},
+    {  500, "D"},
+    {  400, "CD"},
+    {  100, "C"},
+    {   90, "XC"},
+    {   50, "L"},
+    {   40, "XL"},
+    {   10, "X"},
+    {    9, "IX"},
+    {    5, "V"},
+    {    4, "IV"},
+    {    1, "I"}
+  };
+
+  std::vector<std::pair<int, std::string>>::const_iterator it = int2romanliterals.begin();
+  std::string romannumber_str;
+  while (number) {
+    int curr_val = (*it).first;
+    if (number >= curr_val) {
+      number -= curr_val;
+      romannumber_str += (*it).second;
+    }
+    else {
+      ++it;
+    }
+  }
+
+  return romannumber_str;
+}
+
+/*
+  idea: 
+
+  the first idea to compute all possible settings for the dots, is to go recursive.
+
+  we can be a bit more efficient by excluding configurations in which one of 
+  the 4 8-bit numbers is > 255.
+*/
+void ComputePossibleIPadressesFromDigitSequence(std::string digit_sequence, 
+  int n_dots_to_be_set,
+  std::vector<std::string>* list_ips_ptr) {
+
+
+  return;
 }

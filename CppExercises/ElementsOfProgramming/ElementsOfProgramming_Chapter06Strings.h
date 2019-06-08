@@ -16,6 +16,9 @@ void ElementsOfProgrammingChapter06Strings_RemoveAndReplaceLettersOfStringInPlac
 void ElementsOfProgrammingChapter06Strings_ReverseOrderOfWordsInTextInPlace();
 void ElementsOfProgrammingChapter06Strings_MnemonicsOfPhoneNumber();
 void ElementsOfProgrammingChapter06Strings_LookAndSaySequence();
+void ElementsOfProgrammingChapter06Strings_RomanNumberStringToInteger();
+void ElementsOfProgrammingChapter06Strings_IntegerToShortestRomanNumberString();
+void ElementsOfProgrammingChapter06Strings_MakeIPadressesFromNumber();
 
 
 bool CheckIsPalindromeWord(std::string str);
@@ -35,6 +38,13 @@ void FindMnemonicsOfPhonenumber_Recursion(std::vector<std::string>* list_mnemoni
   std::string curr_mnemonic);
 
 std::string FindNthElementOfLookAndSaySequence(const int n);
+
+int RomanNumberStringToInteger(const std::string* str_ptr);
+std::string IntegerToShortestRomanNumberString(int number);
+
+void ComputePossibleIPadressesFromDigitSequence(std::string digit_sequence,
+  int n_dots_to_be_set,
+  std::vector<std::string>* list_ips_ptr);
 
 
 
