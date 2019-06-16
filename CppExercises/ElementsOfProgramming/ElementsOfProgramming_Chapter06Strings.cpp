@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <map>
+#include <algorithm>
 
 
 void ElementsOfProgrammingChapter06Strings() {
@@ -93,6 +94,24 @@ void ElementsOfProgrammingChapter06Strings() {
   std::cout << "-- Exercise: MakeIPadressesFromNumber" << std::endl;
   std::cout << "------------------------------" << std::endl;
   ElementsOfProgrammingChapter06Strings_MakeIPadressesFromNumber();
+
+  //--------- Exercise: SinusoidalOrdering
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: SinusoidalOrdering" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_SinusoidalOrdering();
+
+  //--------- Exercise: RunlengthEncodingDecoding
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: RunlengthEncodingDecoding" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_RunlengthEncodingDecoding();
+  
+  //--------- Exercise: RabinKarp
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "-- Exercise: RabinKarp" << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  ElementsOfProgrammingChapter06Strings_RabinKarp();
 
   return;
 }
@@ -429,8 +448,12 @@ void ElementsOfProgrammingChapter06Strings_MakeIPadressesFromNumber() {
   const std::string ipadress_withoutdots = "25525511";
 
   // compute all possible ip-adresses
-  std::vector<std::string> list_ipadresses;
-  ComputePossibleIPadressesFromDigitSequence(ipadress_withoutdots, 4, &list_ipadresses);
+  std::vector<std::string> list_ipadresses;  
+  ComputePossibleIPadressesFromDigitSequence_Loops(ipadress_withoutdots, &list_ipadresses);
+
+  // Alternative algorithm using recursion
+  //std::string ipadress;
+  //ComputePossibleIPadressesFromDigitSequence_Recursive(ipadress_withoutdots, 3, ipadress, &list_ipadresses);
 
   // print the result
   std::cout << "The digit sequence " << ipadress_withoutdots << " could be one of the following ip-adresses" << std::endl;
@@ -442,6 +465,106 @@ void ElementsOfProgrammingChapter06Strings_MakeIPadressesFromNumber() {
   return;
 }
 
+
+/*
+  Exercise description: 
+
+  The sinusoidal ordering is heuristically given by distributing the string
+  over three ranks and then going left to right through the 1st, then 2nd, and then 3rd rank
+                           e          blank            l
+  "Hello World!"  -->   H    l     o         W      r    d
+                                l                o           !
+
+                 -->  "e lHloWrdlo!"
+
+  Given a string, compute its sinusoidal ordering.
+  
+*/
+void ElementsOfProgrammingChapter06Strings_SinusoidalOrdering() {
+
+  // setting
+  std::string str = "Hello World!";
+  std::string str_cpy = str;
+
+  // compute sinusoidal ordering
+  SinusoidalOrder(&str);
+
+  // print the result
+  std::cout << str_cpy << " reads in sinusoidal order:" << std::endl;
+  std::cout << str << std::endl;
+
+  return;
+}
+
+/*
+  Exercise description:
+
+  Run-Length-encoding (RLE) of a string of small letters means to write
+  the number of consecutive appearances of the same letter followed
+  by the letter.
+
+  Given a string consisting of small letters, find the Runlength-encoded string.
+  Given a RLE-string, find the decoded string.
+
+*/
+void ElementsOfProgrammingChapter06Strings_RunlengthEncodingDecoding() {
+
+  // setting
+  std::string str = "abcdefghijklmnoffffffffffggg";
+  int n_relevant = str.size();
+  std::cout << str << " is going to be RLE encoded." << std::endl;
+  
+  // Encoding/Decoding --- O(n) space 
+  std::cout << "O(n) space algorithm:" << std::endl;
+  str = RunLengthEncoding(&str, n_relevant);
+  std::cout << str << " (after encoding)" << std::endl;
+  str = RunLengthDecoding(&str, str.size());
+  std::cout << str << " (after decoding)" << std::endl;
+  
+  // Encoding/Decoding --- O(1) space
+  std::cout << "O(1) space algorithm:" << std::endl;
+  for (int i = 0; i < 10; ++i) {  // to have enough space allocated for in-place algorithm
+    str += " ";
+  }
+  int n_relevant_encoded = RunLengthEncoding_Inplace(&str, n_relevant);
+  std::cout << str << " (after encoding)" << std::endl;
+  int n_relevant_decoded = RunLengthDecoding_Inplace(&str, n_relevant_encoded);
+  std::cout << str << " (after decoding)" << std::endl;
+  
+
+  // print
+
+  return;
+}
+
+/*
+  Exercise descipription:
+
+  implement the RabinKarp search algorithm, which allows to search a
+  string in another string in average O(n) time.
+
+*/
+void ElementsOfProgrammingChapter06Strings_RabinKarp() {
+
+  // setting
+  std::string text = "In computer science, the Rabin–Karp algorithm or Karp–Rabin algorithm is a string-searching algorithm created by Richard M. Karp and Michael O. Rabin (1987) that uses hashing to find any one of a set of pattern strings in a text. For text of length n and p patterns of combined length m, its average and best case running time is O(n+m) in space O(p), but its worst-case time is O(nm). In contrast, the Aho–Corasick string-matching algorithm has asymptotic worst-time complexity O(n+m) in space O(m). A practical application of the algorithm is detecting plagiarism. Given source material, the algorithm can rapidly search through a paper for instances of sentences from the source material, ignoring details such as case and punctuation. Because of the abundance of the sought strings, single - string searching algorithms are impractical.";
+  std::string search_str = "imprac";
+
+  // find substring
+  int position = RabinKarp(&text, &search_str);
+
+  // result
+  if (position >= 0) {
+    std::cout << "RabinKarp found the string \"";
+    std::cout << search_str << " at position: " << position << std::endl;
+    std::cout << "The text at this position is " << text.substr(position, 10) << std::endl;
+  }
+  else {
+    std::cout << "RabinKarp did not find the search string." << std::endl;
+  }  
+
+  return;
+}
 
 /**
  *----------------------------------------------------------------------------------------------
@@ -944,11 +1067,462 @@ std::string IntegerToShortestRomanNumberString(int number) {
 
   we can be a bit more efficient by excluding configurations in which one of 
   the 4 8-bit numbers is > 255.
-*/
-void ComputePossibleIPadressesFromDigitSequence(std::string digit_sequence, 
-  int n_dots_to_be_set,
-  std::vector<std::string>* list_ips_ptr) {
 
+  Note: not sure if ip adresses with less than three points exist, e.g. a single 42
+        might also be a valid ip adress. these cannot be handled by this algorithm
+        because it will be called with 3 dots to be set initially.
+*/
+void ComputePossibleIPadressesFromDigitSequence_Recursive(std::string digit_sequence,
+  int n_dots_to_be_set,
+  std::string ip,
+  std::vector<std::string>* list_ips_ptr) {
+  std::vector<std::string>& list_ips = *list_ips_ptr;
+  // 1. for every dot to be set there needs to be at least one digit
+  // 2. for every dot to be set there cannot be more than three additional digits
+  int n_digits = digit_sequence.size();
+  if ((n_digits < n_dots_to_be_set + 1) ||
+    (n_digits > 3 + n_dots_to_be_set * 3)) {
+    return;
+  }
+  // base case
+  if (n_dots_to_be_set == 0) {
+    int num = stoi(digit_sequence);
+    if (num >= 0 && num < 256) {
+      ip += digit_sequence;
+      list_ips.emplace_back(ip);
+    }
+    else {
+      // else: this digit sequence cannot be part of a valid ip adress
+    }
+    return;
+  }
+  int n_possible = n_digits >= 3 ? 3 : n_digits;
+  for (int i = 0; i < n_possible; ++i) {
+    std::string str_8bit = digit_sequence.substr(0, i + 1);
+    int num_8bit = stoi(str_8bit);
+    if (num_8bit < 256) {
+      ip += str_8bit;
+      ip += '.';
+      ComputePossibleIPadressesFromDigitSequence_Recursive(digit_sequence.substr(i + 1, n_digits),
+        n_dots_to_be_set - 1,
+        ip,
+        list_ips_ptr);
+      ip = ip.substr(0, ip.size() - str_8bit.size() - 1);
+    }    
+  }
+  return;
+}
+
+/*
+  We can avoid recursion because we know that there are at maximum 3 possible values
+  for each of the 4 8bit parts. Since the length of the 4th 8bit number is fixed,
+  once the other three are fixed, we do have in total 3*3*3 = 27 possibilites.
+  These can be traversed by three nested loops.
+
+  -> time complexity: O(1) because always at maximum 27*O(1) operations
+     assuming the input length is constant, or more precisely bounded to be <= 12.
+
+ */
+void ComputePossibleIPadressesFromDigitSequence_Loops(
+  const std::string digit_sequence, std::vector<std::string>* list_ips_ptr) {
+  const int n_digits = digit_sequence.size();
+  for (int i = 1; i <= 3 && i < n_digits; ++i) {
+    std::string first_8bit = digit_sequence.substr(0, i);
+    if (IsValid8bitPart(first_8bit)) {
+      for (int j = 1; j <= 3 && (i + j) < n_digits; ++j) {
+        std::string second_8bit = digit_sequence.substr(i, j);
+        if (IsValid8bitPart(second_8bit)) {
+          for (int k = 1; k <= 3 && (i + j + k) < n_digits; ++k) {
+            std::string third_8bit = digit_sequence.substr(i + j, k);
+            std::string fourth_8bit = digit_sequence.substr(i + j + k, n_digits - (i + j + k));
+            if (IsValid8bitPart(third_8bit) && IsValid8bitPart(fourth_8bit)) {
+              std::string ip = first_8bit + "." + second_8bit + "." + third_8bit + "." + fourth_8bit;
+              list_ips_ptr->emplace_back(ip);
+            }
+          }
+        }
+      }      
+    }
+  }
+  return;
+}
+
+bool IsValid8bitPart(const std::string digit_sequence) {
+  if (digit_sequence.front() == '0' && digit_sequence.size() > 1) {
+    return false; // 0 is allowed, but 01, 001, and so on not
+  }
+  int num = stoi(digit_sequence);
+  return (num >= 0 && num < 256) ? true : false;
+}
+
+
+/*
+  Idea:
+
+    If we use O(n) space, it is easy to devise an O(n) time algorithm:
+    starting at index 1, go through the str in steps of 4 to get the top rank
+    elements and append them to the new string.
+    starting at index 0, go through the str in steps of 2 to get the middle rank.
+    starting at index 3, go through the str in streps of 4 to get the bottom rank.
+
+    -> would be O(n) time and O(n) space
+
+  Interesting Alternative:
+
+    Seeing the reordering as a permutation  (also O(n) and O(n))
+
+    Motivated by the fact, that the reordering of the string can be viewed as
+    applying a permutation to the original string, one might think that
+    there is an O(n) time algorithm that works in place 
+    (given an array of elements and an array that represents the permutation
+    one can use the permutation-array to store for each element 
+    the information whether it has been set to its new place or not and
+    thus break free from cyclic permutations).
+
+    Thus if we grant ourselves O(n) to store the info whether an element has been
+    permuted already we can work as we would for a permutation!
+
+    Instead of storing the permuation as an array, we compute the new index
+    for each element on the fly and permute.
+
+    -> O(n) space to avoid cyclic permutation, O(n) time
+
+*/
+void SinusoidalOrder(std::string* str_ptr) {
+  std::string& str = *str_ptr;
+
+  const int n_elem = str.size();
+  const int n_per_block = 4;
+  const int n_blocks = n_elem / n_per_block;
+  const int n_in_unfull_block = n_elem % n_per_block; // at the end of the str, maybe an partly filled block
+  const int n_elem_1strank = n_blocks + ((n_in_unfull_block >= 2) ? 1 : 0);
+  const int n_elem_2ndrank = 2 * n_blocks + ((n_in_unfull_block >= 1) ? 1 : 0 + (n_in_unfull_block >= 3) ? 1 : 0);
+  const int n_elem_3rdrank = n_blocks + ((n_in_unfull_block >= 3) ? 1 : 0);
+
+  int source_i = 0;
+  int target_i;
+  char next_char_to_be_set = str.at(source_i);
+  std::vector<bool> perm_done(n_elem, false);
+  int n_perms_done_from_left = 0;
+  for (int i = 0; i < n_elem; ++i) {
+    int n_blocks_before_source_i = source_i / n_per_block;
+    if (source_i % n_per_block == 0) { // becomes a 2nd rank element
+      target_i = n_elem_1strank + 2 * n_blocks_before_source_i;
+    }
+    else if (source_i % n_per_block == 1) { // becomes a 1st rank element
+      target_i = n_blocks_before_source_i;
+    }
+    else if (source_i % n_per_block == 2) { // becomes a 2nd rank element
+      target_i = n_elem_1strank + 2 * n_blocks_before_source_i + 1;
+    }
+    else if (source_i % n_per_block == 3) { // becomes a 3rd rank element
+      target_i = n_elem_1strank + n_elem_2ndrank + n_blocks_before_source_i;
+    }
+    char target_old_char = str.at(target_i);
+    str.at(target_i) = next_char_to_be_set;
+    perm_done.at(source_i) = true;
+    // prepare for next round
+    if (perm_done.at(target_i) == false) {
+      next_char_to_be_set = target_old_char;
+      source_i = target_i;
+    }
+    else { // start new cycle
+      if (i == n_elem - 1) {
+        break;
+      }
+      while (perm_done.at(n_perms_done_from_left)) { ++n_perms_done_from_left; }      
+      source_i = n_perms_done_from_left;
+      next_char_to_be_set = str.at(source_i);
+    }    
+  }
 
   return;
+}
+
+/*
+  idea: with O(n) space it is easy
+
+  go through the string until finding a new character counting the old
+
+*/
+std::string RunLengthEncoding(std::string* str_ptr, int n_relevant) {
+  std::string& str = *str_ptr;
+  std::string str_encoded;   
+  int count;
+  for (int i = 0; i < n_relevant - 1; i += count) {
+    count = 1;
+    while (i + count < n_relevant && str.at(i + count) == str.at(i)) {
+      ++count;
+    }
+    str_encoded += std::to_string(count);
+    str_encoded += str.at(i);    
+  }
+  if (str.at(n_relevant - 1) != str.at(n_relevant - 2)) {
+    str_encoded += '1' + str.at(n_relevant - 1);
+  }
+  return str_encoded;
+}
+
+/*
+  idea: with O(n) space it is easy
+
+  just go through the encoded string, identify the numbers and the next letter
+  and append the letter a number of times to the resulting string
+
+*/
+std::string RunLengthDecoding(std::string* str_ptr, int n_relevant) {
+  std::string& str = *str_ptr;
+  std::string str_decoded;
+  for (int i = 0; i < n_relevant; ++i) {
+    std::string count_as_str;
+    count_as_str += str.at(i);  // note: the very first char in the string must be a digit
+    if (isdigit(str.at(i + 1))) { // note: the last char in the string must be a letter
+      count_as_str += str.at(++i);
+    }
+    int count = stoi(count_as_str);
+    char letter = str.at(++i);
+    while (count) {
+      str_decoded += letter;
+      --count;
+    }
+  }
+  return str_decoded;
+}
+
+
+/*
+  Idea for in-place:
+
+  working in place, we have the difficulty that the result can be shorter
+  and can be longer than the input (e.g. "abc" becomes "1a1b1c").
+
+  -> even if we computed the length of the result, we could not
+     start to fill the result backwards from there because we might
+     overwrite values that we need.
+
+  => we can always start at the back, and then shift the result to the
+     beginning
+
+  Note: we assume that the given string is long enough for the result
+*/
+int RunLengthEncoding_Inplace(std::string* str_ptr, int n_relevant) {
+  std::string& str = *str_ptr;
+
+  // 0. count how many single letters there are, in order to know how large result becomes
+  int count_singles = 0;
+  for (int j = 1; j < n_relevant - 1; ++j) {
+    if (str.at(j + 1) != str.at(j) && str.at(j - 1) != str.at(j)) {
+      ++count_singles;
+    }
+  }
+  if (str.at(0) != str.at(1)) {
+    ++count_singles;
+  }
+  if (str.at(n_relevant - 1) != str.at(n_relevant - 2)) {
+    ++count_singles;
+  }
+
+  // 1. replace sequences >= 2 (in this step result becomes shorter or stays equal size)
+  int n_result = 0;
+  int write_i = 0;
+  int read_i = 0;
+  int n_equal = 1;
+  while (read_i < n_relevant - 1) {
+    if (str.at(read_i + 1) == str.at(read_i)) {
+      ++n_equal;
+    }
+    else {
+      if (n_equal > 1) {
+        std::string count_as_str = std::to_string(n_equal);
+        str.replace(write_i, count_as_str.size(), count_as_str);
+        write_i += count_as_str.size();
+        n_equal = 1;
+      }
+      // write the letter
+      str.at(write_i++) = str.at(read_i);
+    }
+    ++read_i;
+  }
+  // take care of last character
+  if (n_equal > 1) {
+    std::string count_as_str = std::to_string(n_equal);
+    str.replace(write_i, count_as_str.size(), count_as_str);
+    write_i += count_as_str.size();
+  }
+  // write the letter
+  str.at(write_i) = str.at(read_i);
+
+  // fill up the part after the result with blanks
+  for (int j = write_i + 1; j < (int)str.size(); ++j) {
+    str.at(j) = ' ';
+  }
+
+  // 2. encode the single letters (in this step result becomes larger),
+  //    -> traverse backwards, startin at length of result
+  read_i = write_i;
+  int n_relevant_output = read_i + count_singles + 1;
+  if ((int)str.size() < n_relevant_output) {
+    // ERROR
+    std::cout << "For inplace algorithm you need to provide long enough string." << std::endl;
+    str = "error";
+    return 0;
+  }
+  write_i = n_relevant_output - 1;
+  while (read_i >= 0) {
+    str.at(write_i--) = str.at(read_i--); // the letter    
+    if (read_i >= 0 && isdigit(str.at(read_i))) {
+      while (isdigit(str.at(read_i))) {
+        str.at(write_i--) = str.at(read_i--);
+      }
+    }
+    else { // if no digit is left of the letter, it is a single letter
+      str.at(write_i--) = '1';
+    }
+  }
+
+  return n_relevant_output;
+}
+
+int RunLengthDecoding_Inplace(std::string* str_ptr, int n_relevant) {
+  std::string& str = *str_ptr;
+
+  // 0. count the output length
+  int n_result = 0;
+  for (int i = 0; i < n_relevant; ++i) {
+    std::string count_as_str;
+    count_as_str += str.at(i);
+    while (i + 1 < n_relevant && isdigit(str.at(i + 1))) {
+      count_as_str += str.at(++i);
+    }
+    // note: at this point the next char is a letter
+    n_result += stoi(count_as_str);
+    ++i; // now i as at the letter. with the loop increment it will go to next digit
+  }
+
+  // 1. do the compression
+  int write_i = 0;
+  for (int read_i = 0; read_i < n_relevant; ++read_i) {
+    std::string count_as_str;
+    count_as_str += str.at(read_i);
+    while (read_i + 1 < n_relevant && isdigit(str.at(read_i + 1))) {
+      count_as_str += str.at(++read_i);
+    }
+    // note: at this point read_i is at the last digit of current number
+    int count = stoi(count_as_str);
+    if (count > 1) {
+      str.replace(write_i, count_as_str.size(), count_as_str);
+      write_i += count_as_str.size();
+    }
+    // write the letter
+    str.at(write_i++) = str.at(++read_i);
+  }  
+
+  // 2. do the expansion
+  int n_after_compression = write_i; // write_i is one beyond the last written letter
+  write_i = n_result - 1;
+  for (int read_i = n_after_compression - 1; read_i >= 0; --read_i) {
+    char letter = str.at(read_i);
+    if (read_i - 1 >= 0 && isdigit(str.at(read_i - 1))) { // if a number comes left, we still need to decode
+      std::string count_as_str;
+      while (read_i - 1 >= 0 && isdigit(str.at(read_i - 1))) {
+        count_as_str += str.at(--read_i);
+      }
+      // note: at this point read_i is at the leftmost digit of current number
+      std::reverse(count_as_str.begin(), count_as_str.end());
+      int count = stoi(count_as_str);
+      for (int k = 0; k < count; ++k) {
+        str.at(write_i--) = letter;
+      }
+      // note: read_i will be decremented to reach the next letter by the loop
+    }
+    else { // if left of the letter comes another letter, the current was already decoded
+      str.at(write_i--) = letter;
+    }
+  }
+
+  // 3. fill up the remaining part
+  for (int i = n_result; i < (int)str.size(); ++i) {
+    str.at(i) = ' ';
+  }
+
+  return n_result;
+}
+
+/*
+  idea: 
+
+  RabinKarp is closely related to the brute force algorithm.
+
+  iterate through the text and check if the string that is build starting
+  at the current letter matches the search-string.
+
+  naively implemented, this could result in O(n*m) runtime, e.g
+
+  text = aaaaaa
+  search = aaab
+  --> will make n/2 checks, each of which takes m comparisons
+
+  the key-insight to improve this is to use a rolling hash-function of a string,
+  i.e. one which is additive in the included chars.
+
+*/
+int RabinKarp(const std::string* text_ptr, const std::string* search_str_ptr) {
+  const std::string& text = *text_ptr;
+  const std::string& search_str = *search_str_ptr;
+
+  int position = -1;
+  unsigned long long hash_search_str = RollingHash(search_str_ptr, std::numeric_limits<unsigned long long>::max());
+  int search_str_len = search_str.size();    
+
+  // check if we have a match already at position 0
+  std::string initial_str_in_text = text.substr(0, search_str_len);
+  unsigned long long hash_oldcandidate = RollingHash(&initial_str_in_text, std::numeric_limits<unsigned long long>::max());
+  if (hash_oldcandidate == hash_search_str) {
+    if (search_str.compare(text.substr(0, search_str_len)) == 0) {
+      return 0;  // position 0 gives a match
+    }
+  }
+
+  // go through all other starting-positions for the substring in the text
+  for (int i = 1; i < text.size() - search_str_len; ++i) {
+    char removed = text.at(i - 1);
+    char added = text.at(i + search_str_len - 1);
+    unsigned long long hash_newcandidate = RollingHash(hash_oldcandidate, removed, added, search_str_len, std::numeric_limits<unsigned long long>::max());
+    if (hash_newcandidate == hash_search_str) {      
+      if (search_str.compare(text.substr(i, search_str_len)) == 0) {
+        position = i;
+        break;
+      }
+    }
+    hash_oldcandidate = hash_newcandidate;
+  }
+
+  return position;
+}
+
+/*
+  idea: 
+
+  the window moves left-to-right through the char-array
+
+  -> the leftmost char is removed, i.e. it must be the one at the highest power
+  -> the rightmost char is the newest, i.e. it was just added at order 0
+*/
+unsigned long long RollingHash(const std::string* str_ptr, const unsigned long long max_allowed) {
+  const std::string& str = *str_ptr;
+  const int kMult = 53;
+  unsigned long long hash_code = 0;
+  for (int i = 0; i < (int)str.size(); ++i) {
+    char c = str.at(i);
+    hash_code = hash_code * kMult + c;
+  }
+  return hash_code % max_allowed;
+}
+
+unsigned long long RollingHash(const unsigned long long old_hash,
+  const char removed, const char added, const int window_len, const unsigned long long max_allowed) {
+  const int kMult = 53;
+  const unsigned long long val_to_remove = pow(kMult, window_len - 1) * removed;
+  const unsigned long long new_hash = (old_hash - val_to_remove) * kMult + added;
+  return new_hash % max_allowed;
 }
